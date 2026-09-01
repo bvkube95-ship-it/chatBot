@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import React from 'react'
 import type { MessageBox } from './types'
 import user from './assets/user.png'
 import robot from './assets/robot.png'
@@ -48,12 +49,11 @@ function ChatMessages() {
 
   return (
     <>
-      {chatMessages.map((message) => (
+      {chatMessages.map(({ message, sender, id }) => (
         <ChatMessage
-          key={message.id}
-          message={message.message}
-          sender={message.sender}
-          id={message.id}
+          message={message}
+          sender={sender}
+          id={id}
         />
       ))}
     </>
