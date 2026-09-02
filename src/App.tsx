@@ -1,10 +1,10 @@
-import React from 'react'
+import { useState } from 'react'
 import type { MessageBox, ChatInputProps, ChatMessagesProps } from './types'
 import user from './assets/user.png'
 import robot from './assets/robot.png'
 
 function ChatInput({ chatMessages, setChatMessages }: ChatInputProps) {
-  const [inputText, setInputText] = React.useState('')
+  const [inputText, setInputText] = useState('')
 
   function saveTextInput(event: React.ChangeEvent<HTMLInputElement>) {
     setInputText(event.target.value)
@@ -68,7 +68,7 @@ function ChatMessages({ chatMessages }: ChatMessagesProps) {
 }
 
 function App() {
-  const [chatMessages, setChatMessages] = React.useState<MessageBox[]>([
+  const [chatMessages, setChatMessages] = useState<MessageBox[]>([
     {
       message: 'hello chatbot',
       sender: 'user',
