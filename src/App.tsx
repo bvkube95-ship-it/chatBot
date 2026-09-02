@@ -30,8 +30,15 @@ function ChatInput({ chatMessages, setChatMessages }: ChatInputProps) {
         size={30}
         value={inputText} 
         onChange={saveTextInput}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            sendMessage()
+          }
+        }}
         />
-      <button onClick={sendMessage}>Send</button>
+      <button 
+        onClick={sendMessage}
+      >Send</button>
     </>
   )
 }
