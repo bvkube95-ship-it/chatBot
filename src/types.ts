@@ -8,3 +8,7 @@ export type ChatInputProps = {
   chatMessages: MessageBox[]
   setChatMessages: React.Dispatch<React.SetStateAction<MessageBox[]>>
 }
+
+export type ChatMessagesProps = {
+  chatMessages: MessageBox[]
+}
