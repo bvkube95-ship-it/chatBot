@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Chatbot } from 'supersimpledev'
 import type { MessageBox, ChatInputProps, ChatMessagesProps } from './types'
 import user from './assets/user.png'
 import robot from './assets/robot.png'
@@ -11,11 +12,23 @@ function ChatInput({ chatMessages, setChatMessages }: ChatInputProps) {
   }
 
   function sendMessage() {
-    setChatMessages([
+    const newChatMessages: MessageBox[] = [
       ...chatMessages,
       {
         message: inputText,
         sender: 'user',
+        id: crypto.randomUUID()
+      }
+    ]
+    
+    setChatMessages(newChatMessages)
+
+    const response = Chatbot.getResponse(inputText)
+    setChatMessages([
+      ...newChatMessages,
+      {
+        message: response,
+        sender: 'robot',
         id: crypto.randomUUID()
       }
     ])
