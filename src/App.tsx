@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Chatbot } from 'supersimpledev'
 import type { MessageBox, ChatInputProps, ChatMessagesProps } from './types'
+import './App.css'
 import user from './assets/user.png'
 import robot from './assets/robot.png'
 
@@ -37,8 +38,9 @@ function ChatInput({ chatMessages, setChatMessages }: ChatInputProps) {
   }
 
   return (
-    <>
+    <div className="chat-input-container">
       <input 
+        className="chat-input"
         placeholder="Send a message to Chatbot"
         size={30}
         value={inputText} 
@@ -51,24 +53,42 @@ function ChatInput({ chatMessages, setChatMessages }: ChatInputProps) {
         />
       <button 
         onClick={sendMessage}
+        className="send-btn"
       >Send</button>
-    </>
+    </div>
   )
 }
 
 function ChatMessage({ message, sender }: MessageBox) {
   return (
-    <div>
-      {sender === 'robot' && <img src={robot} width={50} />}
-      {message}
-      {sender === 'user' && <img src={user} width={50} />}
+    <div className={
+        sender === 'user'
+        ? 'chat-message-user' 
+        : 'chat-message-robot'
+      }>
+      {sender === 'robot' && <img src={robot} className="chat-message-profile" />}
+      <div className="chat-message-text">
+        {message}
+      </div>  
+      {sender === 'user' && <img src={user} className="chat-message-profile" />}
     </div>
   )
 }
 
 function ChatMessages({ chatMessages }: ChatMessagesProps) {
+  const chatMessagesRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const containerElem = chatMessagesRef.current
+    if (containerElem) {
+      containerElem.scrollTop = containerElem.scrollHeight
+    }
+  }, [chatMessages])
   return (
-    <>
+    <div 
+      className="chat-messages-container"
+      ref={chatMessagesRef}
+    >
       {chatMessages.map(({ message, sender, id }) => (
         <ChatMessage
           message={message}
@@ -76,7 +96,7 @@ function ChatMessages({ chatMessages }: ChatMessagesProps) {
           id={id}
         />
       ))}
-    </>
+    </div>
   )
 }
 
@@ -105,15 +125,15 @@ function App() {
   ])
 
   return (
-    <>
+    <div className="app-container">
+      <ChatMessages 
+        chatMessages={chatMessages}
+      />
       <ChatInput 
         chatMessages={chatMessages}
         setChatMessages={setChatMessages}
       />
-      <ChatMessages 
-        chatMessages={chatMessages}
-      />
-    </>
+    </div>
   )
 }
 
