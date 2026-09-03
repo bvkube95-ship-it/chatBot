@@ -39,6 +39,11 @@ body {
     position: relative;
 }
 
+.welcome-message {
+    text-align: center;
+    color: rgb(120, 120, 120);
+}
+
 .chat-message-user {
     display: flex;
     justify-content: end;

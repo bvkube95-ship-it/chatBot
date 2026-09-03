@@ -91,6 +91,7 @@ function ChatMessages({ chatMessages }: ChatMessagesProps) {
     >
       {chatMessages.map(({ message, sender, id }) => (
         <ChatMessage
+          key={id}
           message={message}
           sender={sender}
           id={id}
@@ -101,31 +102,13 @@ function ChatMessages({ chatMessages }: ChatMessagesProps) {
 }
 
 function App() {
-  const [chatMessages, setChatMessages] = useState<MessageBox[]>([
-    {
-      message: 'hello chatbot',
-      sender: 'user',
-      id: 'id1'
-    },
-    {
-      message: 'Hello! How can I help you?',
-      sender: 'robot',
-      id: 'id2'
-    },
-    {
-      message: 'can you get me todays date?',
-      sender: 'user',
-      id: 'id3'
-    },
-    {
-      message: 'Today is September 27',
-      sender: 'robot',
-      id: 'id4'
-    }
-  ])
+  const [chatMessages, setChatMessages] = useState<MessageBox[]>([])
 
   return (
     <div className="app-container">
+      {chatMessages.length === 0 && 
+        <p className="welcome-message">Write messages bellow</p>
+      }
       <ChatMessages 
         chatMessages={chatMessages}
       />
