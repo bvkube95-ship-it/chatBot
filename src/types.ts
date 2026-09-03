@@ -1,14 +1,17 @@
 export interface MessageBox {
   message: string
-  sender: "user" | "robot"
+  sender: "user" | "bot"
   id: string
 }
 
-export type ChatInputProps = {
+export interface ChatMessagesProps {
   chatMessages: MessageBox[]
-  setChatMessages: React.Dispatch<React.SetStateAction<MessageBox[]>>
+  isBotTyping: boolean
 }
 
-export type ChatMessagesProps = {
+export interface ChatInputProps {
   chatMessages: MessageBox[]
+  setChatMessages: React.Dispatch<React.SetStateAction<MessageBox[]>>
+  isBotTyping: boolean
+  setIsBotTyping: React.Dispatch<React.SetStateAction<boolean>>
 }

@@ -3,16 +3,21 @@ import { Chatbot } from 'supersimpledev'
 import type { MessageBox, ChatInputProps, ChatMessagesProps } from './types'
 import './App.css'
 import user from './assets/user.png'
-import robot from './assets/robot.png'
+import bot from './assets/robot.png'
+import loadingCircle from './assets/loading-spinner.gif'
 
-function ChatInput({ chatMessages, setChatMessages }: ChatInputProps) {
+function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping }: ChatInputProps) {
   const [inputText, setInputText] = useState('')
 
   function saveTextInput(event: React.ChangeEvent<HTMLInputElement>) {
     setInputText(event.target.value)
   }
 
-  function sendMessage() {
+  async function sendMessage() {
+    if (isBotTyping) {
+      return
+    }
+
     const newChatMessages: MessageBox[] = [
       ...chatMessages,
       {
@@ -21,20 +26,22 @@ function ChatInput({ chatMessages, setChatMessages }: ChatInputProps) {
         id: crypto.randomUUID()
       }
     ]
-    
-    setChatMessages(newChatMessages)
 
-    const response = Chatbot.getResponse(inputText)
+    setChatMessages(newChatMessages)
+    setInputText('')
+    setIsBotTyping(true)
+
+    const response = await Chatbot.getResponseAsync(inputText)
+
     setChatMessages([
       ...newChatMessages,
       {
         message: response,
-        sender: 'robot',
+        sender: 'bot',
         id: crypto.randomUUID()
       }
     ])
-
-    setInputText('')
+    setIsBotTyping(false)
   }
 
   return (
@@ -45,6 +52,7 @@ function ChatInput({ chatMessages, setChatMessages }: ChatInputProps) {
         size={30}
         value={inputText} 
         onChange={saveTextInput}
+        disabled={isBotTyping}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             sendMessage()
@@ -54,6 +62,7 @@ function ChatInput({ chatMessages, setChatMessages }: ChatInputProps) {
       <button 
         onClick={sendMessage}
         className="send-btn"
+        disabled={isBotTyping}
       >Send</button>
     </div>
   )
@@ -64,9 +73,9 @@ function ChatMessage({ message, sender }: MessageBox) {
     <div className={
         sender === 'user'
         ? 'chat-message-user' 
-        : 'chat-message-robot'
+        : 'chat-message-bot'
       }>
-      {sender === 'robot' && <img src={robot} className="chat-message-profile" />}
+      {sender === 'bot' && <img src={bot} className="chat-message-profile" />}
       <div className="chat-message-text">
         {message}
       </div>  
@@ -75,7 +84,7 @@ function ChatMessage({ message, sender }: MessageBox) {
   )
 }
 
-function ChatMessages({ chatMessages }: ChatMessagesProps) {
+function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {
   const chatMessagesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -83,7 +92,8 @@ function ChatMessages({ chatMessages }: ChatMessagesProps) {
     if (containerElem) {
       containerElem.scrollTop = containerElem.scrollHeight
     }
-  }, [chatMessages])
+  }, [chatMessages, isBotTyping])
+
   return (
     <div 
       className="chat-messages-container"
@@ -97,24 +107,38 @@ function ChatMessages({ chatMessages }: ChatMessagesProps) {
           id={id}
         />
       ))}
+      {isBotTyping && (
+        <div className="chat-message-bot">
+          <img src={bot} className="chat-message-profile" />
+          <div className="chat-message-text">
+            <img src={loadingCircle} className="chat-loading-circle" />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 function App() {
   const [chatMessages, setChatMessages] = useState<MessageBox[]>([])
+  const [isBotTyping, setIsBotTyping] = useState(false)
 
   return (
     <div className="app-container">
-      {chatMessages.length === 0 && 
-        <p className="welcome-message">Write messages bellow</p>
-      }
+      {chatMessages.length === 0 && (
+          <p className="welcome-message">
+            Welcome to the chatbot project! Send a message using the textbox below.
+          </p>
+        )}
       <ChatMessages 
         chatMessages={chatMessages}
+        isBotTyping={isBotTyping}
       />
       <ChatInput 
         chatMessages={chatMessages}
         setChatMessages={setChatMessages}
+        isBotTyping={isBotTyping}
+        setIsBotTyping={setIsBotTyping}
       />
     </div>
   )

@@ -50,9 +50,13 @@ body {
     align-items: start;
 }
 
-.chat-message-robot {
+.chat-message-bot {
     display: flex;
     align-items: start;
+}
+
+.chat-loading-circle {
+    width: 50px;
 }
 
 .chat-message-text {
