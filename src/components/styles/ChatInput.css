@@ -15,6 +15,9 @@
     border-width: 1px;
     font-size: 15px;
     flex-grow: 1;
+    background-color: rgb(34, 34, 34);
+    border: 1px solid rgb(63, 63, 63);
+    color: rgb(230, 230, 230);
 }
 
 .chat-input-container {
