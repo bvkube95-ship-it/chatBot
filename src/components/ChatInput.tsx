@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import type { MessageBox, ChatInputProps } from '../types'
-import { Chatbot } from 'supersimpledev'
 import './styles/ChatInput.css'
 
 function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping }: ChatInputProps) {
@@ -28,17 +27,42 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
     setInputText('')
     setIsBotTyping(true)
 
-    const response = await Chatbot.getResponseAsync(inputText)
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: inputText }),
+      })
 
-    setChatMessages([
-      ...newChatMessages,
-      {
-        message: response,
-        sender: 'bot',
-        id: crypto.randomUUID()
+      if (!res.ok) {
+        throw new Error(`Server error`)
       }
-    ])
-    setIsBotTyping(false)
+
+      const data = await res.json()
+
+      setChatMessages([
+        ...newChatMessages,
+        {
+          message: data.reply,
+          sender: 'bot',
+          id: crypto.randomUUID()
+        }
+      ])
+    } catch (error) {
+      console.error(error)
+      setChatMessages([
+        ...newChatMessages,
+        {
+          message: 'Error: Unable to get response from the server.',
+          sender: 'bot',
+          id: crypto.randomUUID()
+        }
+      ])
+    } finally {
+      setIsBotTyping(false)
+    }
   }
 
   return (
