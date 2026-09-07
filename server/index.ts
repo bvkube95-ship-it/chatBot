@@ -2,11 +2,13 @@ import express from 'express'
 import cors from 'cors'
 
 const app = express()
-app.use(cors())
+app.use(cors({
+    origin: 'http://localhost:5173'
+}))
 app.use(express.json())
 
 const OLLAMA_URL = 'http://localhost:11434/api/chat'
-const OLLAMA_MODEL = 'qwen3:4b'
+const AI_MODEL = 'qwen3:4b'
 
 app.post('/api/chat', async (req, res) => {
     const { message } = req.body as { message: string }
@@ -22,7 +24,7 @@ app.post('/api/chat', async (req, res) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: OLLAMA_MODEL,
+                model: AI_MODEL,
                 messages: [{ role: 'user', content: message }],
                 stream: false,
         })
@@ -44,4 +46,3 @@ const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
 })
-
