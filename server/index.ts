@@ -27,6 +27,7 @@ app.post('/api/chat', async (req, res) => {
                 model: AI_MODEL,
                 messages: [{ role: 'user', content: message }],
                 stream: false,
+                keep_alive: '30m'
         })
     })
 
