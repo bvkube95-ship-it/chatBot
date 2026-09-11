@@ -1,7 +1,7 @@
 import type { MessageBox } from '../types'
+import CodeBlock from './CodeBlock'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import rehypeHighlight from 'rehype-highlight'
 import 'highlight.js/styles/github-dark.css'
 import bot from '../assets/robot.png'
 import user from '../assets/user.png'
@@ -20,8 +20,29 @@ function ChatMessage({ message, sender }: MessageBox) {
         {sender === 'bot' ? (
           <ReactMarkdown 
             remarkPlugins={[remarkGfm]} 
-            rehypePlugins={[rehypeHighlight]}
-          >{message}</ReactMarkdown>
+            components={{
+              code({ className, children, ...props }) {
+                const match = /language-(\w+)/.exec(className || '')
+                const isInLine = !className
+
+                if (isInLine) {
+                  return (
+                    <code className="inline-code" {...props}>
+                      {children}
+                    </code>
+                  )
+                }
+
+                return (
+                  <CodeBlock
+                    language={match ? match[1] : ''}
+                    code={String(children).replace(/\n$/, '')}
+                  />
+                )
+              }
+            }}
+          >{message}
+          </ReactMarkdown>
         ) : (
           message
         )}

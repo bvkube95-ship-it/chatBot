@@ -15,3 +15,8 @@ export interface ChatInputProps {
   isBotTyping: boolean
   setIsBotTyping: React.Dispatch<React.SetStateAction<boolean>>
 }
+
+export interface CodeBlockProps {
+  language: string
+  code: string
+}

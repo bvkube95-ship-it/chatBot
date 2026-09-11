@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import SYSTEM_PROMPT from './system_propmt'
 
 const app = express()
 app.use(cors({
@@ -25,7 +26,10 @@ app.post('/api/chat', async (req, res) => {
             },
             body: JSON.stringify({
                 model: AI_MODEL,
-                messages: [{ role: 'user', content: message }],
+                messages: [
+                    { role: 'system', content: SYSTEM_PROMPT },
+                    { role: 'user', content: message }
+                ],
                 stream: false,
                 keep_alive: '30m'
         })
