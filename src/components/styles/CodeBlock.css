@@ -1,17 +1,17 @@
 .code-block-wrapper {
-  border-radius: 8px;
+  border-radius: 20px;
   overflow: hidden;
   margin: 12px 0;
   max-width: 100%;
+  width: 750px;
 }
 
 .code-block-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #2d2d2d;
+  background: #282c34;
   padding: 6px 12px;
-  border-bottom: 1px solid #444;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }
@@ -21,6 +21,18 @@
   color: #999;
   text-transform: lowercase;
   font-family: monospace;
+  display: flex;
+  align-items: center;
+  color: white;
+  user-select: none;
+  font-size: 15px;
+}
+
+.code-slash-icon {
+  margin-right: 5px;
+  font-size: 14px;
+  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .code-block-copy-btn {
@@ -29,8 +41,8 @@
   color: #ccc;
   font-size: 12px;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 7px;
+  border-radius: 20px;
   transition: background 0.2s;
 }
 
@@ -49,4 +61,23 @@
   width: 20px;
   height: 20px;
   color: white;
+}
+
+.code-block-wrapper pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.code-block-wrapper pre::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.code-block-wrapper pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.code-block-wrapper pre::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
 }

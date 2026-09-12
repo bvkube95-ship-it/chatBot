@@ -12,21 +12,34 @@
 .chat-message-bot {
     display: flex;
     align-items: start;
+    
 }
 
 .chat-loading-circle {
     width: 50px;
 }
 
-.chat-message-text {
-    background-color: rgb(34, 34, 34);
+.chat-message-text-user {
     color: rgb(230, 230, 230);
     padding: 15px 20px;
-    border-radius: 10px;
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 20px;
-    max-width: 500px;
+    max-width: 750px;
+    background-color: rgb(30, 30, 30);
+    border-radius: 15px;
+
+    overflow-wrap: break-word;
+    min-width: 0;
+}
+
+.chat-message-text-bot {
+    color: rgb(230, 230, 230);
+    padding: 15px 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 20px;
+    max-width: 750px;
 
     overflow-wrap: break-word;
     min-width: 0;

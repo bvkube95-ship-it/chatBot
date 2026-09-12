@@ -3,7 +3,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import type { CodeBlockProps } from '../types'
 import { IonIcon } from '@ionic/react';
-import { copyOutline, checkmark } from 'ionicons/icons';
+import { copyOutline, checkmark, codeSlashOutline } from 'ionicons/icons';
 import './styles/CodeBlock.css'
 
 function CodeBlock({ language, code }: CodeBlockProps) {
@@ -18,8 +18,14 @@ function CodeBlock({ language, code }: CodeBlockProps) {
   return (
     <div className="code-block-wrapper">
       <div className="code-block-header">
-        <span className="code-block-lang">{language || 'text'}</span>
-        <button className="code-block-copy-btn" onClick={handleCopy}>
+        <span className="code-block-lang">
+          <IonIcon icon={codeSlashOutline} className="code-slash-icon"/>
+          {language || 'text'}</span>
+        <button 
+          className="code-block-copy-btn" 
+          onClick={handleCopy}
+          disabled={copied}
+        >
           {copied ? (
             <IonIcon
               icon={checkmark}

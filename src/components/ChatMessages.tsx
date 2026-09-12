@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import ChatMessage from './ChatMessage'
 import type { ChatMessagesProps } from '../types'
-import bot from '../assets/robot.png'
 import loadingCircle from '../assets/loading-spinner.gif'
 import './styles/ChatMessages.css'
 
@@ -30,7 +29,6 @@ function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {
       ))}
       {isBotTyping && (
         <div className="chat-message-bot">
-          <img src={bot} className="chat-message-profile" />
           <div className="chat-message-text">
             <img src={loadingCircle} className="chat-loading-circle" />
           </div>
