@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import type { MessageBox, ChatInputProps } from '../types'
+import { IonIcon } from '@ionic/react';
+import { arrowUp } from 'ionicons/icons';
 import './styles/ChatInput.css'
 
 function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping }: ChatInputProps) {
@@ -67,9 +69,9 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
 
   return (
     <div className="chat-input-container">
-      <input 
+      <input
         className="chat-input"
-        placeholder="Send a message to Chatbot"
+        placeholder="Write a message..."
         size={30}
         value={inputText} 
         onChange={saveTextInput}
@@ -79,12 +81,14 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
             sendMessage()
           }
         }}
-        />
+    />
       <button 
         onClick={sendMessage}
         className="send-btn"
         disabled={isBotTyping}
-      >Send</button>
+      >
+        <IonIcon icon={arrowUp} className='send-button-icon' />
+      </button>
     </div>
   )
 }
