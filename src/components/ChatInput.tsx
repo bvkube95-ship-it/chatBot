@@ -68,28 +68,31 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
   }
 
   return (
-    <div className="chat-input-container">
-      <input
-        className="chat-input"
-        placeholder="Write a message..."
-        size={30}
-        value={inputText} 
-        onChange={saveTextInput}
-        disabled={isBotTyping}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            sendMessage()
-          }
-        }}
-    />
-      <button 
-        onClick={sendMessage}
-        className="send-btn"
-        disabled={isBotTyping}
-      >
-        <IonIcon icon={arrowUp} className='send-button-icon' />
-      </button>
-    </div>
+    <>
+      <div className="chat-input-container">
+        <input
+          className="chat-input"
+          placeholder="Write a message..."
+          size={30}
+          value={inputText} 
+          onChange={saveTextInput}
+          disabled={isBotTyping}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              sendMessage()
+            }
+          }}
+      />
+        <button 
+          onClick={sendMessage}
+          className="send-btn"
+          disabled={isBotTyping}
+        >
+          <IonIcon icon={arrowUp} className='send-button-icon' />
+        </button>
+      </div>
+        <p className="ai-mistakes-message">AI can make mistakes</p>
+    </>
   )
 }
 

@@ -1,7 +1,7 @@
 .chat-input-container {
     position: relative;
     display: flex;
-    margin-bottom: 20px;
+    margin-bottom: 13px;
 }
 
 .chat-input-container:focus-within .send-btn {
@@ -30,6 +30,13 @@
 
 .chat-input:disabled::placeholder {
     opacity: 0.5;
+}
+
+.ai-mistakes-message {
+    color: rgb(124, 124, 124);
+    font-size: 15px;
+    text-align: center;
+    margin-top: 0px;
 }
 
 .send-btn {
