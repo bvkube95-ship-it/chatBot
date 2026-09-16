@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import type { MessageBox, ChatInputProps } from '../types'
 import { IonIcon } from '@ionic/react';
 import { arrowUp, stopOutline } from 'ionicons/icons';
@@ -6,10 +6,14 @@ import './styles/ChatInput.css'
 
 function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping }: ChatInputProps) {
   const [inputText, setInputText] = useState('')
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   function saveTextInput(event: React.ChangeEvent<HTMLInputElement>) {
     setInputText(event.target.value)
   }
+
+  const controller = new AbortController()
+  abortControllerRef.current = controller
 
   async function sendMessage() {
     if (isBotTyping) {
@@ -36,6 +40,7 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ message: inputText }),
+        signal: controller.signal
       })
 
       if (!res.ok) {
@@ -53,7 +58,17 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
         }
       ])
     } catch (error) {
-      console.error(error)
+      if (error instanceof DOMException && error.name === "AbortError") {
+        setChatMessages([
+          ...newChatMessages,
+          {
+            message: "Request cancelled",
+            sender: "bot",
+            id: crypto.randomUUID()
+          }
+        ])
+      } else {
+        console.error(error)
       setChatMessages([
         ...newChatMessages,
         {
@@ -62,9 +77,16 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
           id: crypto.randomUUID()
         }
       ])
+      }
     } finally {
+      abortControllerRef.current = null
       setIsBotTyping(false)
     }
+  }
+
+  function cancelRequest() {
+    abortControllerRef.current?.abort()
+    setIsBotTyping(false)
   }
 
   return (
@@ -84,9 +106,9 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
           }}
       />
         <button 
-          onClick={sendMessage}
+          type="button"
+          onClick={isBotTyping ? cancelRequest : sendMessage}
           className="send-btn"
-          disabled={isBotTyping}
         >
           {isBotTyping 
             ? <IonIcon icon={stopOutline} className='send-stop-btn' />

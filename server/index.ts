@@ -18,6 +18,14 @@ app.post('/api/chat', async (req, res) => {
         return res.status(400).json({ error: 'Message is required' })
     }
 
+    const controller = new AbortController()
+
+    res.on('close', () => {
+        if (!res.writableEnded) {
+            controller.abort()
+        }
+    })
+
     try {
         const ollamaRes = await fetch(OLLAMA_URL, {
             method: 'POST',
@@ -30,9 +38,10 @@ app.post('/api/chat', async (req, res) => {
                     { role: 'system', content: SYSTEM_PROMPT },
                     { role: 'user', content: message }
                 ],
-                stream: false,
+                stream: true,
                 keep_alive: '30m'
-        })
+            }),
+            signal: controller.signal,
     })
 
     if (!ollamaRes.ok) {
@@ -42,8 +51,11 @@ app.post('/api/chat', async (req, res) => {
     const data = await ollamaRes.json()
     res.json({ reply: data.message.content})
     } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Internal server error' })
+        if ((error as Error).name === "AbortError") {
+            return
+        }
+        console.log(error)
+        res.status(500).json({ error: 'Internal server error' })
     }
 })
 

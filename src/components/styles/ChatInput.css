@@ -58,11 +58,6 @@
     transition: box-shadow 0.25s ease;
 }
 
-.send-btn:disabled {
-    cursor: default;
-    opacity: 0.5;
-}
-
 .send-stop-btn {
     font-size: 25px;
     color: white;
