@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { MessageBox, ChatInputProps } from '../types'
 import { IonIcon } from '@ionic/react';
-import { arrowUp } from 'ionicons/icons';
+import { arrowUp, stopOutline } from 'ionicons/icons';
 import './styles/ChatInput.css'
 
 function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping }: ChatInputProps) {
@@ -88,7 +88,11 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
           className="send-btn"
           disabled={isBotTyping}
         >
-          <IonIcon icon={arrowUp} className='send-button-icon' />
+          {isBotTyping 
+            ? <IonIcon icon={stopOutline} className='send-stop-btn' />
+            : <IonIcon icon={arrowUp} className='send-stop-btn' />
+          }
+          
         </button>
       </div>
         <p className="ai-mistakes-message">AI can make mistakes</p>
