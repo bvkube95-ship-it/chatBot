@@ -5,19 +5,38 @@ import loadingCircle from '../assets/loading-spinner.gif'
 import './styles/ChatMessages.css'
 
 function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {
-  const chatMessagesRef = useRef<HTMLDivElement>(null);
+
+  const shouldAutoScrollRef = useRef(true)
 
   useEffect(() => {
-    const containerElem = chatMessagesRef.current
-    if (containerElem) {
-      containerElem.scrollTop = containerElem.scrollHeight
-    }
+      const handleScroll = () => {
+          const distanceFromBottom =
+              document.documentElement.scrollHeight -
+              window.scrollY -
+              window.innerHeight
+
+          shouldAutoScrollRef.current = distanceFromBottom < 150
+      }
+
+      window.addEventListener('scroll', handleScroll)
+
+      return () => {
+          window.removeEventListener('scroll', handleScroll)
+      }
+  }, [])
+
+  useEffect(() => {
+      if (shouldAutoScrollRef.current) {
+          window.scrollTo({
+              top: document.documentElement.scrollHeight,
+              behavior: 'smooth'
+          })
+      }
   }, [chatMessages, isBotTyping])
 
   return (
     <div 
       className="chat-messages-container"
-      ref={chatMessagesRef}
     >
       {chatMessages.map(({ message, sender, id }) => (
         <ChatMessage

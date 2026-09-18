@@ -1,7 +1,13 @@
 .chat-input-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 13px;
+    padding: 0 20px;
+
+    box-sizing: border-box;
+
     position: relative;
     display: flex;
-    margin-bottom: 13px;
 }
 
 .chat-input:focus + .send-btn {

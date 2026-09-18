@@ -19,12 +19,14 @@ function App() {
         chatMessages={chatMessages}
         isBotTyping={isBotTyping}
       />
-      <ChatInput 
-        chatMessages={chatMessages}
-        setChatMessages={setChatMessages}
-        isBotTyping={isBotTyping}
-        setIsBotTyping={setIsBotTyping}
-      />
+      <div className="chat-input-wrapper">
+        <ChatInput 
+            chatMessages={chatMessages}
+            setChatMessages={setChatMessages}
+            isBotTyping={isBotTyping}
+            setIsBotTyping={setIsBotTyping}
+        />
+      </div>
     </div>
   )
 }
