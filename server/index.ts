@@ -38,7 +38,7 @@ app.post('/api/chat', async (req, res) => {
                     { role: 'system', content: SYSTEM_PROMPT },
                     { role: 'user', content: message }
                 ],
-                stream: true,
+                stream: false,
                 keep_alive: '30m'
             }),
             signal: controller.signal,
