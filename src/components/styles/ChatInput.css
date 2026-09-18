@@ -4,7 +4,7 @@
     margin-bottom: 13px;
 }
 
-.chat-input-container:focus-within .send-btn {
+.chat-input:focus + .send-btn {
     box-shadow:
         -5px 0 10px rgba(25, 135, 84, 0.3),
         -10px 0 25px rgba(25, 135, 84, 0.2),
