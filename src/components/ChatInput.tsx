@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { MessageBox, ChatInputProps } from '../types'
 import { IonIcon } from '@ionic/react';
 import { arrowUp, stopOutline } from 'ionicons/icons';
@@ -8,17 +8,31 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
   const [inputText, setInputText] = useState('')
   const abortControllerRef = useRef<AbortController | null>(null)
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && isBotTyping) {
+        cancelRequest()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return() => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isBotTyping])
+
   function saveTextInput(event: React.ChangeEvent<HTMLInputElement>) {
     setInputText(event.target.value)
   }
-
-  const controller = new AbortController()
-  abortControllerRef.current = controller
 
   async function sendMessage() {
     if (isBotTyping) {
       return
     }
+
+    const controller = new AbortController()
+    abortControllerRef.current = controller
 
     const newChatMessages: MessageBox[] = [
       ...chatMessages,
