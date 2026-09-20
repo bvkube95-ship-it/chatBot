@@ -22,12 +22,17 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
     }
   }, [isBotTyping])
 
-  function saveTextInput(event: React.ChangeEvent<HTMLInputElement>) {
+  function saveTextInput(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setInputText(event.target.value)
   }
 
   async function sendMessage() {
+    const trimmedInputText = inputText.trim()
     if (isBotTyping) {
+      return
+    }
+
+    if (!trimmedInputText) {
       return
     }
 
@@ -37,7 +42,7 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
     const newChatMessages: MessageBox[] = [
       ...chatMessages,
       {
-        message: inputText,
+        message: trimmedInputText,
         sender: 'user',
         id: crypto.randomUUID()
       }
@@ -53,7 +58,7 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: inputText }),
+        body: JSON.stringify({ message: trimmedInputText }),
         signal: controller.signal
       })
 
@@ -106,15 +111,16 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
   return (
     <>
       <div className="chat-input-container">
-        <input
+        <textarea
           className="chat-input"
           placeholder="Write a message..."
-          size={30}
           value={inputText} 
+          rows={1}
           onChange={saveTextInput}
           disabled={isBotTyping}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault()
               sendMessage()
             }
           }}
