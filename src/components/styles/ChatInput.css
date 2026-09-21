@@ -10,22 +10,28 @@
     display: flex;
 }
 
-.chat-input:focus + .send-btn {
-    box-shadow:
-        -5px 0 10px rgba(25, 135, 84, 0.3),
-        -10px 0 25px rgba(25, 135, 84, 0.2),
-        -20px 0 40px rgba(25, 135, 84, 0.15);
-}
-
 .chat-input {
-    padding: 12px 55px 12px 15px;
+    width: 100%;
+    min-height: 45px;
+    max-height: 200px;
+
+    padding: 12px 60px 12px 15px;
+
     border-radius: 15px;
     border: 1px solid rgb(63, 63, 63);
+
     font-size: 15px;
+    font-family: inherit;
+
     flex-grow: 1;
+
     background-color: rgb(34, 34, 34);
     color: rgb(230, 230, 230);
+
     box-sizing: border-box;
+
+    resize: none;
+
     transition: border-color 0.25s ease;
 }
 
@@ -38,33 +44,91 @@
     opacity: 0.5;
 }
 
-.ai-mistakes-message {
-    color: rgb(124, 124, 124);
-    font-size: 15px;
-    text-align: center;
-    margin-top: 0px;
-}
-
 .send-btn {
     position: absolute;
-    right: 0;
-    top: 0;
-    height: 100%;
+
+    right: 25px;
+    bottom: 5px;
+
+    width: 35px;
+    height: 35px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    background-color: rgb(25, 135, 84);
-    padding: 0 10px;
+    padding: 0;
+
+    background: transparent;
     border: none;
-    border-left: 1px solid rgb(63, 63, 63);
-    border-radius: 0 15px 15px 0;
+    border-radius: 10px;
+
     cursor: pointer;
-    transition: box-shadow 0.25s ease;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.25s ease;
 }
 
-.send-stop-btn {
-    font-size: 25px;
+.send-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.send-btn:active {
+    transform: scale(0.92);
+}
+
+.send-icon {
+    position: relative;
+
+    width: 23px;
+    height: 23px;
+
+    display: block;
+}
+
+.send-icon ion-icon {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+}
+
+.send-icon-white {
     color: white;
+}
+
+.send-icon-green {
+    position: absolute;
+
+    color: rgb(25, 135, 84);
+
+    clip-path: polygon(
+        0 100%,
+        0 100%,
+        0 100%,
+        0 100%
+    );
+
+    transition: clip-path 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-input:focus + .send-btn .send-icon-green {
+    clip-path: polygon(
+        0 100%,
+        0 0,
+        100% 0,
+        100% 100%
+    );
+}
+
+.ai-mistakes-message {
+    color: rgb(124, 124, 124);
+
+    font-size: 15px;
+    text-align: center;
+
+    margin-top: 0;
 }

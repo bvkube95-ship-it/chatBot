@@ -1,12 +1,21 @@
 import { useState, useEffect, useRef } from 'react'
 import type { MessageBox, ChatInputProps } from '../types'
 import { IonIcon } from '@ionic/react';
-import { arrowUp, stopOutline } from 'ionicons/icons';
+import { paperPlaneOutline, stopOutline } from 'ionicons/icons';
 import './styles/ChatInput.css'
 
 function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping }: ChatInputProps) {
   const [inputText, setInputText] = useState('')
   const abortControllerRef = useRef<AbortController | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.style.height = 'auto'
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`
+    }
+  }, [inputText])
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -112,6 +121,7 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
     <>
       <div className="chat-input-container">
         <textarea
+          ref={textareaRef}
           className="chat-input"
           placeholder="Write a message..."
           value={inputText} 
@@ -130,11 +140,17 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
           onClick={isBotTyping ? cancelRequest : sendMessage}
           className="send-btn"
         >
-          {isBotTyping 
-            ? <IonIcon icon={stopOutline} className='send-stop-btn' />
-            : <IonIcon icon={arrowUp} className='send-stop-btn' />
-          }
-          
+          <span className="send-icon">
+            <IonIcon 
+              icon={isBotTyping ? stopOutline : paperPlaneOutline}
+              className="send-icon-white"
+            />
+
+            <IonIcon 
+              icon={isBotTyping ? stopOutline : paperPlaneOutline}
+              className="send-icon-green"
+            />
+          </span>
         </button>
       </div>
         <p className="ai-mistakes-message">AI can make mistakes</p>
