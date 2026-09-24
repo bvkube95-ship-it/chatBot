@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import ChatMessage from './ChatMessage'
-import type { ChatMessagesProps } from '../types'
-import loadingCircle from '../assets/loading-spinner.gif'
+import type { ChatMessagesProps } from '../utils/types'
 import './styles/ChatMessages.css'
 
 function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
-import Fireflies from './components/FireFlies'
-import type { MessageBox } from './types'
+import Fireflies from './components/Fireflies'
+import { getRandomGreeting } from './utils/greetings'
+import type { MessageBox } from './utils/types'
 import './App.css'
 
 function App() {
@@ -10,21 +11,23 @@ function App() {
   const [isBotTyping, setIsBotTyping] = useState(false)
   const isEmpty = chatMessages.length === 0
 
+  const greetings = useMemo(() => getRandomGreeting(), [])
+
   return (
     <div className={`app-container ${isEmpty ? 'empty-state' : ''}`}>
-      {isEmpty && (
-          <>
-            <Fireflies />
-            <p className="welcome-message">
-              Hey there
-            </p>
-          </>
-        )}
       <ChatMessages 
         chatMessages={chatMessages}
         isBotTyping={isBotTyping}
       />
       <div className="chat-input-wrapper">
+        {isEmpty && (
+          <>
+            <Fireflies />
+            <p className="welcome-message">
+              {greetings}
+            </p>
+          </>
+        )}
         <ChatInput 
             chatMessages={chatMessages}
             setChatMessages={setChatMessages}

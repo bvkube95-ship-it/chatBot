@@ -1,14 +1,6 @@
 import { useMemo } from 'react'
+import type { Firefly } from '../utils/types'
 import './styles/Fireflies.css'
-
-interface Firefly {
-  id: number
-  left: number
-  size: number
-  duration: number
-  delay: number
-  drift: number
-}
 
 const FIREFLY_COUNT = 25
 
@@ -36,7 +28,7 @@ function Fireflies() {
             height: `${f.size}px`,
             animationDuration: `${f.duration}s`,
             animationDelay: `${f.delay}s`,
-            // @ts-expect-error — кастомное CSS-свойство для использования в keyframes
+            // @ts-expect-error — a custom CSS property for use in keyframes
             '--drift': `${f.drift}px`,
           }}
         />

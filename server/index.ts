@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import SYSTEM_PROMPT from './system_propmt'
+import SYSTEM_PROMPT from './config/system_propmt'
 
 const app = express()
 app.use(cors({

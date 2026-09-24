@@ -20,3 +20,12 @@ export interface CodeBlockProps {
   language: string
   code: string
 }
+
+export interface Firefly {
+  id: number
+  left: number
+  size: number
+  duration: number
+  delay: number
+  drift: number
+}

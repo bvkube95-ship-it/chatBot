@@ -17,7 +17,7 @@
         0 0 12px 4px rgba(52, 211, 153, 0.4);
 
     animation-name: firefly-fall;
-    animation-timing-function: linear; /* было ease-in-out */
+    animation-timing-function: linear;
     animation-iteration-count: infinite;
     opacity: 0;
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import type { MessageBox, ChatInputProps } from '../types'
+import type { MessageBox, ChatInputProps } from '../utils/types'
 import { IonIcon } from '@ionic/react';
 import { paperPlaneOutline, stopOutline } from 'ionicons/icons';
 import './styles/ChatInput.css'

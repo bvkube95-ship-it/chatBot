@@ -1,4 +1,4 @@
-import type { MessageBox } from '../types'
+import type { MessageBox } from '../utils/types'
 import CodeBlock from './CodeBlock'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
