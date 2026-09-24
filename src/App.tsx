@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useFavicon } from './hooks/useFavicon'
 import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
 import Fireflies from './components/Fireflies'
@@ -10,6 +11,8 @@ function App() {
   const [chatMessages, setChatMessages] = useState<MessageBox[]>([])
   const [isBotTyping, setIsBotTyping] = useState(false)
   const isEmpty = chatMessages.length === 0
+
+  useFavicon(isBotTyping)
 
   const greetings = useMemo(() => getRandomGreeting(), [])
 
