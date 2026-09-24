@@ -154,7 +154,6 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
           </span>
         </button>
       </div>
-        <p className="ai-mistakes-message">AI can make mistakes</p>
     </>
   )
 }

@@ -38,6 +38,17 @@ body {
     flex-direction: column;
 }
 
+.app-container.empty-state {
+    justify-content: center;
+}
+
+.welcome-message {
+    text-align: center;
+    color: white;
+    font-size: 25px;
+}
+
+
 .chat-input-wrapper {
     background-color: rgb(20, 20, 20);
     position: sticky;
@@ -47,6 +58,12 @@ body {
     margin-top: auto;
 
     box-sizing: border-box;
+}
+
+.app-container.empty-state .chat-input-wrapper {
+    position: static;
+    margin-top: 0;
+    background-color: transparent;
 }
 
 .chat-input-wrapper::before {

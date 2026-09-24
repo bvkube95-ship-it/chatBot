@@ -5,7 +5,6 @@ import loadingCircle from '../assets/loading-spinner.gif'
 import './styles/ChatMessages.css'
 
 function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {
-
   const shouldAutoScrollRef = useRef(true)
 
   useEffect(() => {
@@ -49,7 +48,11 @@ function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {
       {isBotTyping && (
         <div className="chat-message-bot">
           <div className="chat-message-text">
-            <img src={loadingCircle} className="chat-loading-circle" />
+            <div className="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
         </div>
       )}
