@@ -14,6 +14,7 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
     if (textarea) {
       textarea.style.height = 'auto'
       textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`
+      textarea.scrollTop = textarea.scrollHeight
     }
   }, [inputText])
 
@@ -97,14 +98,14 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
         ])
       } else {
         console.error(error)
-      setChatMessages([
-        ...newChatMessages,
-        {
-          message: 'Error: Unable to get response from the server.',
-          sender: 'bot',
-          id: crypto.randomUUID()
-        }
-      ])
+        setChatMessages([
+          ...newChatMessages,
+          {
+            message: 'Error: Unable to get response from the server.',
+            sender: 'bot',
+            id: crypto.randomUUID()
+          }
+        ])
       }
     } finally {
       abortControllerRef.current = null
