@@ -88,14 +88,7 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
       ])
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
-        setChatMessages([
-          ...newChatMessages,
-          {
-            message: "Request cancelled",
-            sender: "bot",
-            id: crypto.randomUUID()
-          }
-        ])
+       // nothing
       } else {
         console.error(error)
         setChatMessages([
