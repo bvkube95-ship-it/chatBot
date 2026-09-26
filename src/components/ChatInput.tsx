@@ -13,7 +13,9 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
     const textarea = textareaRef.current
     if (textarea) {
       textarea.style.height = 'auto'
+      const isOverflowing = textarea.scrollHeight > 200
       textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`
+      textarea.style.overflowY = isOverflowing ? 'auto' : 'hidden'
       textarea.scrollTop = textarea.scrollHeight
     }
   }, [inputText])

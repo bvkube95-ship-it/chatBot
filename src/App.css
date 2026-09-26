@@ -90,7 +90,6 @@ body {
     background-color: transparent;
 }
 
-/* Лампа-подсветка над полем ввода */
 .app-container.empty-state .chat-input-wrapper::after {
     content: "";
     position: absolute;
@@ -122,7 +121,7 @@ body {
     50% {
         opacity: 1;
     }
-    /* лёгкие "перебои" мигания лампы */
+
     62% {
         opacity: 0.85;
     }
