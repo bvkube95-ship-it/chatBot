@@ -82,3 +82,57 @@ body {
 
     pointer-events: none;
 }
+
+.app-container.empty-state .chat-input-wrapper {
+    position: static;
+    margin-top: 0;
+    margin-bottom: 75px;
+    background-color: transparent;
+}
+
+/* Лампа-подсветка над полем ввода */
+.app-container.empty-state .chat-input-wrapper::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+
+    width: 500px;
+    height: 220px;
+
+    background: radial-gradient(
+        ellipse at 50% 100%,
+        rgba(74, 222, 128, 0.35) 0%,
+        rgba(74, 222, 128, 0.15) 35%,
+        transparent 70%
+    );
+
+    filter: blur(20px);
+    pointer-events: none;
+    z-index: -1;
+
+    animation: lamp-flicker 4s ease-in-out infinite;
+}
+
+@keyframes lamp-flicker {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+    /* лёгкие "перебои" мигания лампы */
+    62% {
+        opacity: 0.85;
+    }
+    64% {
+        opacity: 1;
+    }
+    78% {
+        opacity: 0.9;
+    }
+    80% {
+        opacity: 1;
+    }
+}

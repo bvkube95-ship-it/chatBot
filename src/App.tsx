@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react'
 import { useFavicon } from './hooks/useFavicon'
 import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
-import Fireflies from './components/Fireflies'
 import { getRandomGreeting } from './utils/greetings'
 import type { MessageBox } from './utils/types'
 import './App.css'
@@ -24,12 +23,9 @@ function App() {
       />
       <div className="chat-input-wrapper">
         {isEmpty && (
-          <>
-            <Fireflies />
             <p className="welcome-message">
               {greetings}
             </p>
-          </>
         )}
         <ChatInput 
             chatMessages={chatMessages}
