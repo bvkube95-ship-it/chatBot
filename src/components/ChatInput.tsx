@@ -135,6 +135,7 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
           type="button"
           onClick={isBotTyping ? cancelRequest : sendMessage}
           className="send-btn"
+          data-tooltip={isBotTyping ? "Stop" : "Send"}
         >
           <span className="send-icon">
             <IonIcon 
