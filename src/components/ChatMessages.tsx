@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import ChatMessage from './ChatMessage'
-import type { MessageBox } from '../utils/types'
+import type { MessageBox } from '../types'
 import './styles/ChatMessages.css'
 
 interface ChatMessagesProps {
