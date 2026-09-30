@@ -1,7 +1,12 @@
 import { useEffect, useRef } from 'react'
 import ChatMessage from './ChatMessage'
-import type { ChatMessagesProps } from '../utils/types'
+import type { MessageBox } from '../utils/types'
 import './styles/ChatMessages.css'
+
+interface ChatMessagesProps {
+  chatMessages: MessageBox[]
+  isBotTyping: boolean
+}
 
 function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {
   const shouldAutoScrollRef = useRef(true)

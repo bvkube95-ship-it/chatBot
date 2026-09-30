@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import type { CodeBlockProps } from '../utils/types'
 import { IonIcon } from '@ionic/react';
 import { copyOutline, checkmark, codeSlashOutline } from 'ionicons/icons';
 import './styles/CodeBlock.css'
+
+interface CodeBlockProps {
+  language: string
+  code: string
+}
 
 function CodeBlock({ language, code }: CodeBlockProps) {
   const [ copied, setCopied ] = useState(false)

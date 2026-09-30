@@ -1,8 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
-import type { MessageBox, ChatInputProps } from '../utils/types'
+import type { MessageBox} from '../utils/types'
 import { IonIcon } from '@ionic/react';
 import { paperPlaneOutline, stopOutline } from 'ionicons/icons';
 import './styles/ChatInput.css'
+
+interface ChatInputProps {
+  chatMessages: MessageBox[]
+  setChatMessages: React.Dispatch<React.SetStateAction<MessageBox[]>>
+  isBotTyping: boolean
+  setIsBotTyping: React.Dispatch<React.SetStateAction<boolean>>
+}
 
 function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping }: ChatInputProps) {
   const [inputText, setInputText] = useState('')
