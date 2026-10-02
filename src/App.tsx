@@ -71,10 +71,10 @@ function App() {
               isBotTyping={isBotTyping}
               setIsBotTyping={setIsBotTyping}
           />
+          {!isEmpty && (
+              <p className="ai-mistakes-message">AI can make mistakes</p>
+          )}
         </div>
-            {!isEmpty && (
-                <p className="ai-mistakes-message">AI can make mistakes</p>
-            )}
       </div>
     </div>
   )
