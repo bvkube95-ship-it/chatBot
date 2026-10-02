@@ -9,38 +9,44 @@ interface ChatMessagesProps {
 }
 
 function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
   const shouldAutoScrollRef = useRef(true)
 
   useEffect(() => {
-      const handleScroll = () => {
-          const distanceFromBottom =
-              document.documentElement.scrollHeight -
-              window.scrollY -
-              window.innerHeight
+    const container = containerRef.current
+    if (!container) return
 
-          shouldAutoScrollRef.current = distanceFromBottom < 150
-      }
+    const handleScroll = () => {
+      const distanceFromButton =
+        container.scrollHeight - container.scrollTop - container.clientHeight
 
-      window.addEventListener('scroll', handleScroll)
+      shouldAutoScrollRef.current = distanceFromButton < 150
+    }
 
-      return () => {
-          window.removeEventListener('scroll', handleScroll)
-      }
+    container.addEventListener('scroll', handleScroll)
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   useEffect(() => {
-      if (shouldAutoScrollRef.current) {
-          window.scrollTo({
-              top: document.documentElement.scrollHeight,
-              behavior: 'smooth'
-          })
-      }
+    const container = containerRef.current
+    if (!container) return
+
+    if (shouldAutoScrollRef.current) {
+        container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth'
+        })
+    }
   }, [chatMessages, isBotTyping])
 
   return (
     <div 
       className="chat-messages-container"
+      ref={containerRef}
     >
+      <div className="chat-messages-inner">
       {chatMessages.map(({ message, sender, id }) => (
         <ChatMessage
           key={id}
@@ -60,6 +66,7 @@ function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

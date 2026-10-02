@@ -2,7 +2,8 @@ add:
   sidebar resizing
   sidebar chats title generation
 fix:
-  empty chats can be created  
+  empty chats can be created
+  message-container scrolling
 
 nvm versions
   nvm use 22.11.0 for prisma

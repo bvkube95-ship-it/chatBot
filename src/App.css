@@ -46,6 +46,10 @@ body {
     justify-content: center;
 }
 
+.app-container.empty-state .chat-messages-container {
+    flex-grow: 0;
+}
+
 .welcome-message {
     text-align: center;
     color: white;
