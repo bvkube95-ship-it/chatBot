@@ -38,13 +38,7 @@ function App() {
   const greetings = useMemo(() => getRandomGreeting(), [])
 
   function createNewChat() {
-    const newChat: ChatSession = {
-      id: crypto.randomUUID(),
-      title: "new chat",
-      messages: [],
-    }
-    setChats([newChat, ...chats])
-    setActiveChatId(newChat.id)
+    setActiveChatId(null)
   }
 
   function updateMessages(messages: MessageBox[]) {
