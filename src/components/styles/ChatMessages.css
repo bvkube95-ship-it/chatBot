@@ -32,7 +32,10 @@
     max-width: 800px;
     margin: 20px auto 0;
     padding: 0 20px;
+    padding-bottom: calc(var(--input-height, 90px) + 20px);
     box-sizing: border-box;
+
+    transition: padding-bottom 0.1s ease;
 }
 
 .app-container.empty-state .chat-input-wrapper::before {

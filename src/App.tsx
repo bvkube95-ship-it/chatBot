@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useFavicon } from './hooks/useFavicon'
 import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
@@ -11,8 +11,25 @@ function App() {
   const [chats, setChats] = useState<ChatSession[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
   const [isBotTyping, setIsBotTyping] = useState(false)
+  const [inputHeight, setInputHeight] = useState(0)
+
+  const inputWrapperRef = useRef<HTMLDivElement>(null)
 
   useFavicon(isBotTyping)
+
+  useEffect(() => {
+    const el = inputWrapperRef.current
+    if (!el) return
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setInputHeight(entry.contentRect.height)
+      }
+    })
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   const activeChat = chats.find((c) => c.id === activeChatId)
   const currentMessages = activeChat?.messages ?? []
@@ -49,17 +66,21 @@ function App() {
   return (
     <div className="app-shell">
       <Sidebar 
-      chats={chats}
-      activeChatId={activeChatId}
-      onSelectChat={setActiveChatId}
-      onNewChat={createNewChat}
+        chats={chats}
+        activeChatId={activeChatId}
+        onSelectChat={setActiveChatId}
+        onNewChat={createNewChat}
       />
-      <div className={`app-container ${isEmpty ? 'empty-state' : ''}`}>
+      <div 
+        className={`app-container ${isEmpty ? 'empty-state' : ''}`}
+        style={{ '--input-height': `${inputHeight}px` } as React.CSSProperties}
+      >
         <ChatMessages 
           chatMessages={currentMessages}
           isBotTyping={isBotTyping}
+          inputHeight={inputHeight}
         />
-        <div className="chat-input-wrapper">
+        <div className="chat-input-wrapper" ref={inputWrapperRef}>
           {isEmpty && (
               <p className="welcome-message">
                 {greetings}

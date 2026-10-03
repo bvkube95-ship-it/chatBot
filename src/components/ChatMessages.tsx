@@ -6,9 +6,10 @@ import './styles/ChatMessages.css'
 interface ChatMessagesProps {
   chatMessages: MessageBox[]
   isBotTyping: boolean
+  inputHeight: number
 }
 
-function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {
+function ChatMessages({ chatMessages, isBotTyping, inputHeight }: ChatMessagesProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const shouldAutoScrollRef = useRef(true)
 
@@ -39,7 +40,7 @@ function ChatMessages({ chatMessages, isBotTyping }: ChatMessagesProps) {
             behavior: 'smooth'
         })
     }
-  }, [chatMessages, isBotTyping])
+  }, [chatMessages, isBotTyping, inputHeight])
 
   return (
     <div 
