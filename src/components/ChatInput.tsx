@@ -8,24 +8,46 @@ interface ChatInputProps {
   chatMessages: MessageBox[]
   setChatMessages: (messages: MessageBox[]) => void
   isBotTyping: boolean
-  setIsBotTyping: React.Dispatch<React.SetStateAction<boolean>>
+  setIsBotTyping: (typing: boolean) => void
+  inputText: string
+  setInputText: (text: string) => void
 }
 
-function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping }: ChatInputProps) {
-  const [inputText, setInputText] = useState('')
+function ChatInput({ 
+  chatMessages, 
+  setChatMessages,
+  isBotTyping, 
+  setIsBotTyping,
+  inputText,
+  setInputText
+}: ChatInputProps) {
+
+  const [isMultiLine, setIsMultiLine] = useState(false)
   const abortControllerRef = useRef<AbortController | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  useEffect(() => {
+ useEffect(() => {
     const textarea = textareaRef.current
-    if (textarea) {
-      textarea.style.height = 'auto'
-      const isOverflowing = textarea.scrollHeight > 200
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`
-      textarea.style.overflowY = isOverflowing ? 'auto' : 'hidden'
-      textarea.scrollTop = textarea.scrollHeight
-    }
+    if (!textarea) return
+
+    textarea.style.height = 'auto'
+
+    const style = getComputedStyle(textarea)
+    const borderTop = parseFloat(style.borderTopWidth)
+    const borderBottom = parseFloat(style.borderBottomWidth)
+    const contentHeight = textarea.scrollHeight + borderTop + borderBottom
+
+    const maxHeight = 200
+    const newHeight = Math.min(contentHeight, maxHeight)
+
+    textarea.style.height = `${newHeight}px`
+    textarea.style.overflowY = contentHeight > maxHeight ? 'auto' : 'hidden'
+
+    const lineHeight = parseFloat(style.lineHeight)
+    const isTextMultiLine = textarea.scrollHeight > lineHeight + 24
+    setIsMultiLine(isTextMultiLine)
   }, [inputText])
+
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -47,13 +69,8 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
 
   async function sendMessage() {
     const trimmedInputText = inputText.trim()
-    if (isBotTyping) {
-      return
-    }
-
-    if (!trimmedInputText) {
-      return
-    }
+    if (isBotTyping) return
+    if (!trimmedInputText) return
 
     const controller = new AbortController()
     abortControllerRef.current = controller
@@ -125,7 +142,7 @@ function ChatInput({ chatMessages, setChatMessages, isBotTyping, setIsBotTyping 
       <div className="chat-input-container">
         <textarea
           ref={textareaRef}
-          className="chat-input"
+          className={`chat-input ${isMultiLine ? 'multiline' : ''}`}
           placeholder="Write a message..."
           value={inputText} 
           rows={1}
