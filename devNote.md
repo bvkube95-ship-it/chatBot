@@ -1,6 +1,6 @@
 add:
-  sidebar resizing
   sidebar chats title generation
+  add popups for buttons
 
 nvm versions
   nvm use 22.11.0 for prisma
