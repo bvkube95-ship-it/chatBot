@@ -60,7 +60,10 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
 
   if (isCollapsed) {
     return (
-      <button className="sidebar-expand-btn" onClick={() => setIsCollapsed(false)}>
+      <button
+        className="sidebar-expand-btn" 
+        data-tooltip={"Epxand sidebar"}
+        onClick={() => setIsCollapsed(false)}>
         <IonIcon icon={chevronForwardOutline} />
       </button>
     )
@@ -73,7 +76,10 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
           <IonIcon icon={addOutline} className="new-chat-icon" />
           New chat
         </button>
-        <button className="sidebar-collapse-btn" onClick={() => setIsCollapsed(true)}>
+        <button 
+          className="sidebar-collapse-btn" 
+          data-tooltip={"Collapse sidebar"}
+          onClick={() => setIsCollapsed(true)}>
           <IonIcon icon={chevronBackOutline} />
         </button>
       </div>

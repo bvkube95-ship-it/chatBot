@@ -6,6 +6,7 @@ import Sidebar from './components/Sidebar'
 import { getRandomGreeting } from './utils/greetings'
 import type { MessageBox, ChatSession } from './types'
 import './App.css'
+import './components/styles/shared.css'
 
 const NEW_CHAT_KEY = 'new-chat'
 
