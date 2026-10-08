@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import type { ChatSession } from '../types'
 import { IonIcon } from '@ionic/react'
 import { addOutline, chatbubbleOutline } from 'ionicons/icons'
-import sidebar from "../assets/sidebar-icon.png"
+import sidebarIcon from "../assets/sidebar-icon.png"
 import './styles/Sidebar.css'
 
 interface SidebarProps {
@@ -117,13 +117,15 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
           setIsCollapsed(false)
         }}
       >
-        <img src={sidebar} className="sidebar-icon" />
+        <img src={sidebarIcon} className="sidebar-icon" />
       </button>
 
       <div
         className={`sidebar sidebar-phantom ${isPhantomVisible ? 'visible' : ''}`}
         style={{ width: `${width}px` }}
       >
+        <span className="sidebar-title sidebar-title-phantom">NYX Assist</span>
+
         <div className="sidebar-header">
           <button className="new-chat-btn" onClick={onNewChat}>
             <IonIcon icon={addOutline} className="new-chat-icon" />
@@ -144,7 +146,7 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
         className="sidebar-toggle-btn"
         onClick={() => setIsCollapsed(true)}
       >
-        <img src={sidebar} className="sidebar-icon" />
+        <img src={sidebarIcon} className="sidebar-icon" />
       </button>
       <span className="sidebar-title">NYX Assist</span>
     </div>
