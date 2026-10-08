@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import type { ChatSession } from '../types'
 import { IonIcon } from '@ionic/react'
-import { addOutline, chatbubbleOutline, chevronBackOutline, chevronForwardOutline } from 'ionicons/icons'
+import { addOutline, chatbubbleOutline } from 'ionicons/icons'
+import sidebar from "../assets/sidebar-icon.png"
 import './styles/Sidebar.css'
 
 interface SidebarProps {
@@ -14,14 +15,17 @@ interface SidebarProps {
 const MIN_WIDTH = 200
 const MAX_WIDTH = 420
 const DEFAULT_WIDTH = 260
+const HIDE_DELAY = 200
 
 function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps) {
   const [width, setWidth] = useState(DEFAULT_WIDTH)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
+  const [isPhantomVisible, setIsPhantomVisible] = useState(false)
 
   const sidebarRef = useRef<HTMLDivElement>(null)
   const widthRef = useRef(DEFAULT_WIDTH)
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const startResizing = useCallback(() => {
     setIsResizing(true)
@@ -58,32 +62,31 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
     }
   }, [isResizing, resize, stopResizing])
 
-  if (isCollapsed) {
-    return (
-      <button
-        className="sidebar-expand-btn" 
-        data-tooltip={"Epxand sidebar"}
-        onClick={() => setIsCollapsed(false)}>
-        <IonIcon icon={chevronForwardOutline} />
-      </button>
-    )
+  function cancelHide() {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current)
+      hideTimeoutRef.current = null
+    }
   }
 
-  return (
-    <div className="sidebar" ref={sidebarRef} style={{ width: `${width}px` }}>
-      <div className="sidebar-header">
-        <button className="new-chat-btn" onClick={onNewChat}>
-          <IonIcon icon={addOutline} className="new-chat-icon" />
-          New chat
-        </button>
-        <button 
-          className="sidebar-collapse-btn" 
-          data-tooltip={"Collapse sidebar"}
-          onClick={() => setIsCollapsed(true)}>
-          <IonIcon icon={chevronBackOutline} />
-        </button>
-      </div>
+  function showPhantom() {
+    cancelHide()
+    setIsPhantomVisible(true)
+  }
 
+  function scheduleHide() {
+    cancelHide()
+    hideTimeoutRef.current = setTimeout(() => {
+      setIsPhantomVisible(false)
+    }, HIDE_DELAY)
+  }
+
+  useEffect(() => {
+    return () => cancelHide()
+  }, [])
+
+  function renderChatList() {
+    return (
       <div className="chat-list">
         {chats.map((chat) => (
           <button
@@ -96,13 +99,72 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
           </button>
         ))}
       </div>
+    )
+  }
+
+  if (isCollapsed) {
+  return (
+    <div
+      className="sidebar-phantom-zone"
+      onMouseEnter={showPhantom}
+      onMouseLeave={scheduleHide}
+    >
+      <button
+        className="sidebar-toggle-btn"
+        onClick={() => {
+          cancelHide()
+          setIsPhantomVisible(false)
+          setIsCollapsed(false)
+        }}
+      >
+        <img src={sidebar} className="sidebar-icon" />
+      </button>
 
       <div
-        className={`sidebar-resize-handle ${isResizing ? 'active' : ''}`}
-        onMouseDown={startResizing}
-      />
+        className={`sidebar sidebar-phantom ${isPhantomVisible ? 'visible' : ''}`}
+        style={{ width: `${width}px` }}
+      >
+        <div className="sidebar-header">
+          <button className="new-chat-btn" onClick={onNewChat}>
+            <IonIcon icon={addOutline} className="new-chat-icon" />
+            New chat
+          </button>
+        </div>
+
+        {renderChatList()}
+      </div>
     </div>
   )
 }
+
+  return (
+  <div className="sidebar" ref={sidebarRef} style={{ width: `${width}px` }}>
+    <div className="sidebar-top-row">
+      <button
+        className="sidebar-toggle-btn"
+        onClick={() => setIsCollapsed(true)}
+      >
+        <img src={sidebar} className="sidebar-icon" />
+      </button>
+      <span className="sidebar-title">NYX Assist</span>
+    </div>
+
+    <div className="sidebar-header">
+      <button className="new-chat-btn" onClick={onNewChat}>
+        <IonIcon icon={addOutline} className="new-chat-icon" />
+        New chat
+      </button>
+    </div>
+
+    {renderChatList()}
+
+    <div
+      className={`sidebar-resize-handle ${isResizing ? 'active' : ''}`}
+      onMouseDown={startResizing}
+    />
+  </div>
+)
+}
+
 
 export default Sidebar
