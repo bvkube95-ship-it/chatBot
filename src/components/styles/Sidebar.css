@@ -20,7 +20,9 @@
 }
 
 .sidebar-icon {
-    width: 40px;
+    width: 37px;
+    filter: brightness(0) saturate(100%)
+            invert(80%);
 }
 
 .new-chat-btn {
@@ -31,10 +33,11 @@
     flex-grow: 1;
 
     background-color: transparent;
-    color: white;
+    color: rgb(200, 200, 200);
     border: none;
     border-radius: 10px;
     padding: 10px 14px;
+    margin-bottom: 10px;
 
     font-size: 14px;
     font-family: inherit;
@@ -122,15 +125,25 @@
 }
 
 .sidebar-title {
-    color: rgb(230, 230, 230);
+    flex: 1;
+    min-width: 0;
+
+    color: rgb(215, 215, 215);
     font-family: 'Space Grotesk', sans-serif;
     font-size: 18px;
     font-weight: 600;
+    font-style: italic;
     letter-spacing: -0.03em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     user-select: none;
+}
+
+.chats-span {
+    color: rgb(138, 138, 138);
+    font-size: 13px;
+    margin-bottom: 4px;
 }
 
 .chat-list-item {
@@ -155,12 +168,10 @@
 
 .chat-list-item:hover {
     background-color: rgba(255, 255, 255, 0.06);
-    color: white;
 }
 
 .chat-list-item.active {
     background-color: rgba(25, 135, 84, 0.15);
-    color: white;
 }
 
 .chat-list-icon {
@@ -168,7 +179,7 @@
     flex-shrink: 0;
 }
 
-.chat-list-title {
+.chat-item-title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -231,10 +242,6 @@ body.sidebar-resizing {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.close-sidebar-icon {
-    width: 35px;
 }
 
 .logo {

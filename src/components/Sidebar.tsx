@@ -85,20 +85,31 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
     return () => cancelHide()
   }, [])
 
-  function renderChatList() {
+  function renderSidebarContent() {
     return (
-      <div className="chat-list">
-        {chats.map((chat) => (
-          <button
-            key={chat.id}
-            className={`chat-list-item ${chat.id === activeChatId ? 'active' : ''}`}
-            onClick={() => onSelectChat(chat.id)}
-          >
-            <IonIcon icon={chatbubbleOutline} className="chat-list-icon" />
-            <span className="chat-list-title">{chat.title}</span>
+      <>
+        <div className="sidebar-header">
+          <button className="new-chat-btn" onClick={onNewChat}>
+            <IonIcon icon={addOutline} className="new-chat-icon" />
+            New chat
           </button>
-        ))}
-      </div>
+        </div>
+
+
+        <div className="chat-list">
+          <span className="chats-span">Chats and tasks</span>
+          {chats.map((chat) => (
+            <button
+              key={chat.id}
+              className={`chat-list-item ${chat.id === activeChatId ? 'active' : ''}`}
+              onClick={() => onSelectChat(chat.id)}
+            >
+              <IonIcon icon={chatbubbleOutline} className="chat-list-icon" />
+              <span className="chat-item-title">{chat.title}</span>
+            </button>
+          ))}
+        </div>
+      </>
     )
   }
 
@@ -126,14 +137,7 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
       >
         <span className="sidebar-title sidebar-title-phantom">NYX Assist</span>
 
-        <div className="sidebar-header">
-          <button className="new-chat-btn" onClick={onNewChat}>
-            <IonIcon icon={addOutline} className="new-chat-icon" />
-            New chat
-          </button>
-        </div>
-
-        {renderChatList()}
+        {renderSidebarContent()}
       </div>
     </div>
   )
@@ -150,15 +154,7 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
       </button>
       <span className="sidebar-title">NYX Assist</span>
     </div>
-
-    <div className="sidebar-header">
-      <button className="new-chat-btn" onClick={onNewChat}>
-        <IonIcon icon={addOutline} className="new-chat-icon" />
-        New chat
-      </button>
-    </div>
-
-    {renderChatList()}
+    {renderSidebarContent()}
 
     <div
       className={`sidebar-resize-handle ${isResizing ? 'active' : ''}`}
