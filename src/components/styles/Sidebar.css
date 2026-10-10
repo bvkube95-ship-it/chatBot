@@ -60,6 +60,7 @@
     justify-content: center;
     flex-shrink: 0;
 
+    padding: 0;
     width: 34px;
     height: 34px;
 
@@ -80,20 +81,6 @@
 
 .sidebar-top-row .sidebar-toggle-btn:hover {
     background-color: rgba(255, 255, 255, 0.08);
-}
-
-.sidebar-phantom-zone > .sidebar-toggle-btn {
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    z-index: 30;
-
-    background-color: transparent;
-    border: none;
-}
-
-.sidebar-phantom-zone > .sidebar-toggle-btn:hover {
-    background-color: rgb(45, 45, 45);
 }
 
 .chat-list {
@@ -206,38 +193,6 @@ body.sidebar-resizing {
     user-select: none;
 }
 
-.sidebar.sidebar-phantom {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    z-index: 25;
-
-    padding-top: 70px;
-
-    background-color: rgb(24, 24, 24);
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
-
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-}
-
-.sidebar.sidebar-phantom.visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.sidebar-title-phantom {
-    position: absolute;
-    top: 12px;
-    left: 56px;
-    max-width: calc(100% - 56px - 12px);
-    height: 34px;
-    display: flex;
-    align-items: center;
-}
-
 .collapsed-wrapper {
     display: flex;
     justify-content: center;
@@ -246,4 +201,39 @@ body.sidebar-resizing {
 
 .logo {
     color: white;
+}
+
+.sidebar.collapsed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 25;
+
+    background-color: transparent;
+    border-right-color: transparent;
+    pointer-events: none;
+
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sidebar.collapsed .sidebar-toggle-btn {
+    pointer-events: auto;
+}
+
+.sidebar.collapsed > :not(.sidebar-top-row),
+.sidebar.collapsed .sidebar-title {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed.visible {
+    background-color: rgb(24, 24, 24);
+    border-right-color: rgb(45, 45, 45);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
+}
+
+.sidebar.collapsed.visible > :not(.sidebar-top-row),
+.sidebar.collapsed.visible .sidebar-title {
+    opacity: 1;
 }

@@ -85,84 +85,62 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
     return () => cancelHide()
   }, [])
 
-  function renderSidebarContent() {
-    return (
-      <>
-        <div className="sidebar-header">
-          <button className="new-chat-btn" onClick={onNewChat}>
-            <IonIcon icon={addOutline} className="new-chat-icon" />
-            New chat
-          </button>
-        </div>
-
-
-        <div className="chat-list">
-          <span className="chats-span">Chats and tasks</span>
-          {chats.map((chat) => (
-            <button
-              key={chat.id}
-              className={`chat-list-item ${chat.id === activeChatId ? 'active' : ''}`}
-              onClick={() => onSelectChat(chat.id)}
-            >
-              <IonIcon icon={chatbubbleOutline} className="chat-list-icon" />
-              <span className="chat-item-title">{chat.title}</span>
-            </button>
-          ))}
-        </div>
-      </>
-    )
+  function toggleSidebar() {
+    cancelHide()
+    setIsPhantomVisible(false)
+    setIsCollapsed((prev) => !prev)
   }
 
-  if (isCollapsed) {
+  const className = [
+    'sidebar',
+    isCollapsed && 'collapsed',
+    isCollapsed && isPhantomVisible && 'visible',
+  ].filter(Boolean).join(' ')
+
   return (
     <div
-      className="sidebar-phantom-zone"
-      onMouseEnter={showPhantom}
-      onMouseLeave={scheduleHide}
+      className={className}
+      ref={sidebarRef}
+      style={{ width: `${width}px` }}
+      onMouseEnter={isCollapsed ? showPhantom : undefined}
+      onMouseLeave={isCollapsed ? scheduleHide : undefined}
     >
-      <button
-        className="sidebar-toggle-btn"
-        onClick={() => {
-          cancelHide()
-          setIsPhantomVisible(false)
-          setIsCollapsed(false)
-        }}
-      >
-        <img src={sidebarIcon} className="sidebar-icon" />
-      </button>
-
-      <div
-        className={`sidebar sidebar-phantom ${isPhantomVisible ? 'visible' : ''}`}
-        style={{ width: `${width}px` }}
-      >
-        <span className="sidebar-title sidebar-title-phantom">NYX Assist</span>
-
-        {renderSidebarContent()}
+      <div className="sidebar-top-row">
+        <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
+          <img src={sidebarIcon} className="sidebar-icon" />
+        </button>
+        <span className="sidebar-title">NYX Assist</span>
       </div>
+
+      <div className="sidebar-header">
+        <button className="new-chat-btn" onClick={onNewChat}>
+          <IonIcon icon={addOutline} className="new-chat-icon" />
+          New chat
+        </button>
+      </div>
+
+      <div className="chat-list">
+        <span className="chats-span">Chats and tasks</span>
+        {chats.map((chat) => (
+          <button
+            key={chat.id}
+            className={`chat-list-item ${chat.id === activeChatId ? 'active' : ''}`}
+            onClick={() => onSelectChat(chat.id)}
+          >
+            <IonIcon icon={chatbubbleOutline} className="chat-list-icon" />
+            <span className="chat-item-title">{chat.title}</span>
+          </button>
+        ))}
+      </div>
+
+      {!isCollapsed && (
+        <div
+          className={`sidebar-resize-handle ${isResizing ? 'active' : ''}`}
+          onMouseDown={startResizing}
+        />
+      )}
     </div>
   )
 }
-
-  return (
-  <div className="sidebar" ref={sidebarRef} style={{ width: `${width}px` }}>
-    <div className="sidebar-top-row">
-      <button
-        className="sidebar-toggle-btn"
-        onClick={() => setIsCollapsed(true)}
-      >
-        <img src={sidebarIcon} className="sidebar-icon" />
-      </button>
-      <span className="sidebar-title">NYX Assist</span>
-    </div>
-    {renderSidebarContent()}
-
-    <div
-      className={`sidebar-resize-handle ${isResizing ? 'active' : ''}`}
-      onMouseDown={startResizing}
-    />
-  </div>
-)
-}
-
 
 export default Sidebar
