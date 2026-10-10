@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import type { ChatSession } from '../types'
 import { IonIcon } from '@ionic/react'
-import { addOutline, chatbubbleOutline } from 'ionicons/icons'
+import { chatbubbleOutline, personCircleOutline } from 'ionicons/icons'
 import sidebarIcon from "../assets/sidebar-icon.png"
+import newChat from "../assets/new-chat.png"
 import './styles/Sidebar.css'
 
 interface SidebarProps {
@@ -26,6 +27,8 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
   const sidebarRef = useRef<HTMLDivElement>(null)
   const widthRef = useRef(DEFAULT_WIDTH)
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  /* --------- RESIZING --------- */
 
   const startResizing = useCallback(() => {
     setIsResizing(true)
@@ -62,6 +65,8 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
     }
   }, [isResizing, resize, stopResizing])
 
+  /* --------- PHANTOM SIDEBAR --------- */
+
   function cancelHide() {
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current)
@@ -85,60 +90,87 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
     return () => cancelHide()
   }, [])
 
+  /* --------- HANDLERS --------- */
+
   function toggleSidebar() {
     cancelHide()
     setIsPhantomVisible(false)
     setIsCollapsed((prev) => !prev)
   }
 
-  const className = [
+  /* --------- STATE FOR MARKING ---------*/
+
+  const isRail = isCollapsed && !isPhantomVisible
+
+  const SidebarClassName = [
     'sidebar',
     isCollapsed && 'collapsed',
     isCollapsed && isPhantomVisible && 'visible',
+    isRail && 'rail',
   ].filter(Boolean).join(' ')
 
   return (
-    <div
-      className={className}
-      ref={sidebarRef}
-      style={{ width: `${width}px` }}
-      onMouseEnter={isCollapsed ? showPhantom : undefined}
-      onMouseLeave={isCollapsed ? scheduleHide : undefined}
-    >
-      <div className="sidebar-top-row">
-        <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
-          <img src={sidebarIcon} className="sidebar-icon" />
-        </button>
-        <span className="sidebar-title">NYX Assist</span>
-      </div>
-
-      <div className="sidebar-header">
-        <button className="new-chat-btn" onClick={onNewChat}>
-          <IonIcon icon={addOutline} className="new-chat-icon" />
-          New chat
-        </button>
-      </div>
-
-      <div className="chat-list">
-        <span className="chats-span">Chats and tasks</span>
-        {chats.map((chat) => (
+    <div className={`sidebar-slot ${isCollapsed ? 'collapsed' : ''}`} >
+      <div
+        className={SidebarClassName}
+        ref={sidebarRef}
+        style={isCollapsed ? { '--sidebar-width': `${width}px` } as React.CSSProperties : { width: `${width}px` }}
+        onMouseEnter={isCollapsed ? cancelHide : undefined}
+        onMouseLeave={isCollapsed ? scheduleHide : undefined}
+      >
+        <div className="sidebar-top-row">
           <button
-            key={chat.id}
-            className={`chat-list-item ${chat.id === activeChatId ? 'active' : ''}`}
-            onClick={() => onSelectChat(chat.id)}
+            className="sidebar-toggle-btn"
+            onClick={toggleSidebar}
+            onMouseEnter={isCollapsed ? showPhantom : undefined}
           >
-            <IonIcon icon={chatbubbleOutline} className="chat-list-icon" />
-            <span className="chat-item-title">{chat.title}</span>
+            <img src={sidebarIcon} className="sidebar-icon" />
           </button>
-        ))}
-      </div>
+          <span className="sidebar-title">NYX Assist</span>
+        </div>
 
-      {!isCollapsed && (
-        <div
-          className={`sidebar-resize-handle ${isResizing ? 'active' : ''}`}
-          onMouseDown={startResizing}
-        />
-      )}
+        <div className="sidebar-header">
+          <button 
+            className="new-chat-btn" 
+            onClick={onNewChat}
+            data-tooltip={isRail ? 'New chat' : undefined}
+          >
+            <img src={newChat} className="new-chat-icon" />
+            <span className="new-chat-label">New chat</span>
+          </button>
+        </div>
+
+        <div className="chat-list">
+          <span className="chats-span">Chats and tasks</span>
+          {chats.map((chat) => (
+            <button
+              key={chat.id}
+              className={`chat-list-item ${chat.id === activeChatId ? 'active' : ''}`}
+              onClick={() => onSelectChat(chat.id)}
+            >
+              <IonIcon icon={chatbubbleOutline} className="chat-list-icon" />
+              <span className="chat-item-title">{chat.title}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="sidebar-footer">
+          <button
+            className="account-btn"
+            data-tooltip={isRail ? 'Account' : undefined}
+          >
+            <IonIcon icon={personCircleOutline} className="account-icon" />
+            <span className="account-label">Account</span>
+          </button>
+        </div>
+
+        {!isCollapsed && (
+          <div
+            className={`sidebar-resize-handle ${isResizing ? 'active' : ''}`}
+            onMouseDown={startResizing}
+          />
+        )}
+      </div>
     </div>
   )
 }

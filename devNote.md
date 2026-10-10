@@ -1,5 +1,6 @@
 add:
   sidebar chats title generation
+  make chats archive
 
 nvm versions
   nvm use 22.11.0 for prisma

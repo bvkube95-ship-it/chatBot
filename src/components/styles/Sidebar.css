@@ -1,3 +1,10 @@
+:root {
+    --rail-width: 51px;
+    --sidebar-pad: 8px;
+    --btn-size: 34px;
+    --new-chat-icon-size: 34px;
+    --account-icon-size: 30px;
+}
 .sidebar {
     position: relative;
     flex-shrink: 0;
@@ -8,15 +15,39 @@
 
     display: flex;
     flex-direction: column;
-    padding: 12px;
+    padding: var(--sidebar-pad);
     box-sizing: border-box;
 }
 
-.sidebar-header {
+.sidebar-top-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: 10px;
+    height: var(--btn-size);
+    margin-bottom: 24px;
+}
+
+.sidebar-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    padding: 0;
+    width: var(--btn-size);
+    height: var(--btn-size);
+
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: rgb(200, 200, 200);
+    cursor: pointer;
+
+    transition: background-color 0.15s ease;
+}
+
+.sidebar-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-icon {
@@ -25,19 +56,43 @@
             invert(80%);
 }
 
+.sidebar-title {
+    flex: 1;
+    min-width: 0;
+
+    color: rgb(215, 215, 215);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    font-style: italic;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
 .new-chat-btn {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     flex-grow: 1;
+
+    height: var(--btn-size);
+    padding: 0 calc((var(--btn-size) - var(--new-chat-icon-size)) / 2);
+    box-sizing: border-box;
 
     background-color: transparent;
     color: rgb(200, 200, 200);
     border: none;
     border-radius: 10px;
-    padding: 10px 14px;
-    margin-bottom: 10px;
 
     font-size: 14px;
     font-family: inherit;
@@ -51,36 +106,17 @@
 }
 
 .new-chat-icon {
-    font-size: 18px;
-}
-
-.sidebar-toggle-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: var(--new-chat-icon-size);
+    height: var(--new-chat-icon-size);
     flex-shrink: 0;
+    object-fit: contain;
 
-    padding: 0;
-    width: 34px;
-    height: 34px;
-
-    border-radius: 8px;
-    color: rgb(200, 200, 200);
-    font-size: 16px;
-    cursor: pointer;
-
-    transition: background-color 0.15s ease;
+    filter: brightness(0) saturate(100%) invert(80%);
 }
 
-.sidebar-top-row .sidebar-toggle-btn {
-    position: relative;
-
-    background: transparent;
-    border: none;
-}
-
-.sidebar-top-row .sidebar-toggle-btn:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+.new-chat-label,
+.account-label {
+    white-space: nowrap;
 }
 
 .chat-list {
@@ -103,34 +139,12 @@
     border-radius: 8px;
 }
 
-.sidebar-top-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    height: 34px;
-    margin-bottom: 24px;
-}
-
-.sidebar-title {
-    flex: 1;
-    min-width: 0;
-
-    color: rgb(215, 215, 215);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 18px;
-    font-weight: 600;
-    font-style: italic;
-    letter-spacing: -0.03em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    user-select: none;
-}
-
 .chats-span {
     color: rgb(138, 138, 138);
     font-size: 13px;
+    margin-top: 15px;
     margin-bottom: 4px;
+    white-space: nowrap;
 }
 
 .chat-list-item {
@@ -172,6 +186,44 @@
     text-overflow: ellipsis;
 }
 
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 12px;
+}
+
+.account-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+
+    height: var(--btn-size);
+    padding: 0 calc((var(--btn-size) - var(--account-icon-size)) / 2);
+    box-sizing: border-box;
+
+    background: transparent;
+    color: rgb(200, 200, 200);
+    border: none;
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.account-btn:hover {
+    background-color: rgb(40, 40, 40);
+}
+
+.account-icon {
+    width: var(--account-icon-size);
+    height: var(--account-icon-size);
+    color: rgb(200, 200, 200);
+    flex-shrink: 0;
+}
+
 .sidebar-resize-handle {
     position: absolute;
     top: 0;
@@ -193,14 +245,9 @@ body.sidebar-resizing {
     user-select: none;
 }
 
-.collapsed-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.logo {
-    color: white;
+.sidebar-slot.collapsed {
+    width: var(--rail-width);
+    flex-shrink: 0;
 }
 
 .sidebar.collapsed {
@@ -208,32 +255,54 @@ body.sidebar-resizing {
     top: 0;
     left: 0;
     z-index: 25;
+    width: var(--rail-width);
+    overflow: visible;
 
-    background-color: transparent;
-    border-right-color: transparent;
-    pointer-events: none;
-
-    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+        background-color 0.22s ease,
+        box-shadow 0.22s ease;
 }
 
-.sidebar.collapsed .sidebar-toggle-btn {
-    pointer-events: auto;
+.sidebar.collapsed:not(.visible) .chat-list,
+.sidebar.collapsed:not(.visible) .sidebar-title,
+.sidebar.collapsed:not(.visible) .new-chat-label,
+.sidebar.collapsed:not(.visible) .account-label {
+    display: none;
 }
 
-.sidebar.collapsed > :not(.sidebar-top-row),
-.sidebar.collapsed .sidebar-title {
-    opacity: 0;
-    transition: opacity 0.2s ease;
+.sidebar.collapsed:not(.visible) .new-chat-btn,
+.sidebar.collapsed:not(.visible) .account-btn {
+    width: var(--btn-size);
+    flex-grow: 0;
 }
 
 .sidebar.collapsed.visible {
+    width: var(--sidebar-width, 260px);
+    overflow: hidden;
     background-color: rgb(24, 24, 24);
-    border-right-color: rgb(45, 45, 45);
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
-    pointer-events: auto;
 }
 
-.sidebar.collapsed.visible > :not(.sidebar-top-row),
-.sidebar.collapsed.visible .sidebar-title {
-    opacity: 1;
+.sidebar.collapsed.visible .chat-list,
+.sidebar.collapsed.visible .sidebar-title,
+.sidebar.collapsed.visible .new-chat-label,
+.sidebar.collapsed.visible .account-label {
+    animation: sidebar-content-in 0.22s ease both;
+}
+
+@keyframes sidebar-content-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.sidebar.collapsed:not(.visible) [data-tooltip]::before {
+    bottom: auto;
+    top: 50%;
+    left: calc(100% + 10px);
+    transform: translateY(-50%) translateX(-4px);
+}
+
+.sidebar.collapsed:not(.visible) [data-tooltip]:hover::before {
+    transform: translateY(-50%) translateX(0);
 }
