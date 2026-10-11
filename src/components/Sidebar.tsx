@@ -3,6 +3,7 @@ import type { ChatSession } from '../types'
 import { IonIcon } from '@ionic/react'
 import { chatbubbleOutline, personCircleOutline } from 'ionicons/icons'
 import sidebarIcon from "../assets/sidebar-icon.png"
+import logoIcon from "../assets/logo-white.png"
 import newChat from "../assets/new-chat.png"
 import './styles/Sidebar.css'
 
@@ -123,8 +124,20 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
             className="sidebar-toggle-btn"
             onClick={toggleSidebar}
             onMouseEnter={isCollapsed ? showPhantom : undefined}
+            aria-label={isCollapsed ? 'Open sidebar' : 'Close sidebar'}
           >
-            <img src={sidebarIcon} className="sidebar-icon" />
+            <img 
+              src={sidebarIcon} 
+              className="sidebar-icon sidebar-icon-panel" 
+              alt="" 
+              draggable={false} 
+            />
+            <img 
+              src={logoIcon} 
+              className="sidebar-icon sidebar-icon-logo" 
+              alt="" 
+              draggable={false} 
+            />
           </button>
           <span className="sidebar-title">NYX Assist</span>
         </div>

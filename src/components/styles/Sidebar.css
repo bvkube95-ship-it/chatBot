@@ -3,7 +3,7 @@
     --sidebar-pad: 8px;
     --btn-size: 34px;
     --new-chat-icon-size: 34px;
-    --account-icon-size: 30px;
+    --account-icon-size: 28px;
 }
 .sidebar {
     position: relative;
@@ -28,9 +28,8 @@
 }
 
 .sidebar-toggle-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     flex-shrink: 0;
 
     padding: 0;
@@ -51,9 +50,25 @@
 }
 
 .sidebar-icon {
-    width: 37px;
-    filter: brightness(0) saturate(100%)
-            invert(80%);
+    grid-area: 1 / 1;
+    width: 36px;
+    filter: brightness(0) saturate(100%) invert(80%);
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+}
+
+.sidebar-icon-logo {
+    width: 22px;
+    opacity: 0;
+}
+
+.sidebar.rail .sidebar-icon-logo {
+    opacity: 1;
+    transform: none;
+}
+
+.sidebar.rail .sidebar-icon-panel {
+    opacity: 0;
 }
 
 .sidebar-title {
