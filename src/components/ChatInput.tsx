@@ -1,29 +1,25 @@
 import { useState, useEffect, useRef } from 'react'
-import type { MessageBox} from '../types'
 import { IonIcon } from '@ionic/react';
 import { paperPlaneOutline, stopOutline } from 'ionicons/icons';
 import './styles/ChatInput.css'
 
 interface ChatInputProps {
-  chatMessages: MessageBox[]
-  setChatMessages: (messages: MessageBox[]) => void
   isBotTyping: boolean
-  setIsBotTyping: (typing: boolean) => void
+  onSend: (text: string) => void
+  onCancel: () => void
   inputText: string
   setInputText: (text: string) => void
 }
 
 function ChatInput({ 
-  chatMessages, 
-  setChatMessages,
-  isBotTyping, 
-  setIsBotTyping,
+  isBotTyping,
+  onSend,
+  onCancel,
   inputText,
-  setInputText
+  setInputText,
 }: ChatInputProps) {
 
   const [isMultiLine, setIsMultiLine] = useState(false)
-  const abortControllerRef = useRef<AbortController | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
  useEffect(() => {
@@ -52,7 +48,7 @@ function ChatInput({
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape' && isBotTyping) {
-        cancelRequest()
+        onCancel()
       }
     }
 
@@ -61,80 +57,17 @@ function ChatInput({
     return() => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isBotTyping])
+  }, [isBotTyping, onCancel])
 
   function saveTextInput(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setInputText(event.target.value)
   }
 
-  async function sendMessage() {
-    const trimmedInputText = inputText.trim()
-    if (isBotTyping) return
-    if (!trimmedInputText) return
+  function sendMessage() {
+    if (isBotTyping ) return
+    if (!inputText.trim()) return
 
-    const controller = new AbortController()
-    abortControllerRef.current = controller
-
-    const newChatMessages: MessageBox[] = [
-      ...chatMessages,
-      {
-        message: trimmedInputText,
-        sender: 'user',
-        id: crypto.randomUUID()
-      }
-    ]
-
-    setChatMessages(newChatMessages)
-    setInputText('')
-    setIsBotTyping(true)
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: trimmedInputText }),
-        signal: controller.signal
-      })
-
-      if (!res.ok) {
-        throw new Error(`Server error`)
-      }
-
-      const data = await res.json()
-
-      setChatMessages([
-        ...newChatMessages,
-        {
-          message: data.reply,
-          sender: 'bot',
-          id: crypto.randomUUID()
-        }
-      ])
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") {
-       // nothing
-      } else {
-        console.error(error)
-        setChatMessages([
-          ...newChatMessages,
-          {
-            message: 'Error: Unable to get response from the server.',
-            sender: 'bot',
-            id: crypto.randomUUID()
-          }
-        ])
-      }
-    } finally {
-      abortControllerRef.current = null
-      setIsBotTyping(false)
-    }
-  }
-
-  function cancelRequest() {
-    abortControllerRef.current?.abort()
-    setIsBotTyping(false)
+    onSend(inputText)
   }
 
   return (
@@ -157,7 +90,7 @@ function ChatInput({
       />
         <button 
           type="button"
-          onClick={isBotTyping ? cancelRequest : sendMessage}
+          onClick={isBotTyping ? onCancel : sendMessage}
           className="send-btn"
           data-tooltip={isBotTyping ? "Stop" : "Send"}
         >

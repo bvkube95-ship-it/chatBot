@@ -9,18 +9,21 @@ import type { MessageBox, ChatSession } from './types'
 import './App.css'
 import './components/styles/shared.css'
 
-const NEW_CHAT_KEY = 'new-chat'
-
 function App() {
   const [chats, setChats] = useState<ChatSession[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
-  const [isBotTyping, setIsBotTyping] = useState(false)
   const [inputHeight, setInputHeight] = useState(0)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
 
+  const NEW_CHAT_KEY = 'new-chat'
+  const [typingChatIds, setTypingChatIds] = useState<Set<string>>(new Set())
+  const controllersRef = useRef<Map<string, AbortController>>(new Map())
+
+  const isBotTyping = activeChatId !== null && typingChatIds.has(activeChatId)
+
   const inputWrapperRef = useRef<HTMLDivElement>(null)
 
-  useFavicon(isBotTyping)
+  useFavicon(typingChatIds.size > 0)
 
   useEffect(() => {
     const el = inputWrapperRef.current
@@ -42,7 +45,7 @@ function App() {
 
   const greetings = useMemo(() => getRandomGreeting(), [activeChatId])
 
-  const draftKey = activeChatId ?? 'new-chat'
+  const draftKey = activeChatId ?? NEW_CHAT_KEY
   const draftText = drafts[draftKey] ?? ''
 
   const [titles, setTitles] = useState<Record<string, string>>({})
@@ -86,22 +89,99 @@ function App() {
     setActiveChatId(null)
   }
 
-  function updateMessages(messages: MessageBox[]) {
-    if (activeChat) {
-      setChats(chats.map((c) => 
-        c.id === activeChatId ? {...c, messages} : c
-      ))
-      clearDraft(activeChatId!)
-    } else {
-      const newChat: ChatSession = {
-        id: crypto.randomUUID(),
-        title: "new chat",
-        messages,
-      }
-      setChats([newChat, ...chats])
-      setActiveChatId(newChat.id)
-      clearDraft(NEW_CHAT_KEY)
+  function setTyping(chatId: string, typing: boolean) {
+    setTypingChatIds((prev) => {
+      const next = new Set(prev)
+      if (typing) next.add(chatId)
+      else next.delete(chatId)
+      return next
+    })
+  }
+
+  function appendMessage(chatId: string, message: MessageBox) {
+    setChats((prev) => 
+      prev.map((c) => 
+        c.id === chatId ? { ...c, messages: [...c.messages, message] } : c
+      )
+    )
+  }
+
+  async function sendMessage(text: string) {
+    const trimmed = text.trim()
+    if (!trimmed) return
+    if (activeChatId && typingChatIds.has(activeChatId)) return
+
+    const chatId = activeChatId ?? crypto.randomUUID()
+
+    const userMessage: MessageBox = {
+      message: trimmed,
+      sender: 'user',
+      id: crypto.randomUUID(),
     }
+
+    if (activeChatId) {
+      appendMessage(chatId, userMessage)
+    } else {
+      setChats((prev) => [
+        { id: chatId, messages: [userMessage], title: DEFAULT_TITLE },
+        ...prev,
+      ])
+      setActiveChatId(chatId)
+    }
+
+    clearDraft(draftKey)
+    setTyping(chatId, true)
+
+    const controller = new AbortController()
+    controllersRef.current.set(chatId, controller)
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: trimmed }),
+        signal: controller.signal,
+      })
+
+      if (!res.ok) {
+        throw new Error('Server error')
+      }
+
+      const data = await res.json()
+
+      appendMessage(chatId, {
+        message: data.reply,
+        sender: 'bot',
+        id: crypto.randomUUID(),
+      })
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        // nothing
+      } else {
+        console.error(error)
+        appendMessage(chatId, {
+          message: 'Error: Failed to get a response from the server.',
+          sender: 'bot',
+          id: crypto.randomUUID(),
+        })
+      }
+    } finally {
+
+      if (controllersRef.current.get(chatId) === controller) {
+        controllersRef.current.delete(chatId)
+        setTyping(chatId, false)
+      }
+    }
+  }
+
+  function cancelRequest(chatId: string) {
+    if (!activeChatId) return
+
+    controllersRef.current.get(chatId)?.abort()
+    controllersRef.current.delete(chatId)
+    setTyping(chatId, false)
   }
 
   return (
@@ -128,10 +208,11 @@ function App() {
               </p>
           )}
           <ChatInput 
-              chatMessages={currentMessages}
-              setChatMessages={updateMessages}
               isBotTyping={isBotTyping}
-              setIsBotTyping={setIsBotTyping}
+              onSend={sendMessage}
+              onCancel={() => {
+                if (activeChatId) cancelRequest(activeChatId)
+              }}
               inputText={draftText}
               setInputText={setDraftText}
           />
