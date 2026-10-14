@@ -4,6 +4,7 @@ import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
 import Sidebar from './components/Sidebar'
 import { getRandomGreeting } from './utils/greetings'
+import { DEFAULT_TITLE, requestChatTitle } from './utils/chatTitle'
 import type { MessageBox, ChatSession } from './types'
 import './App.css'
 import './components/styles/shared.css'
@@ -44,6 +45,31 @@ function App() {
   const draftKey = activeChatId ?? 'new-chat'
   const draftText = drafts[draftKey] ?? ''
 
+  const [titles, setTitles] = useState<Record<string, string>>({})
+  const titleRequestRef = useRef<Set<string>>(new Set())
+
+  useEffect(() => {
+    for (const chat of chats) {
+      if (titleRequestRef.current.has(chat.id)) continue
+
+      const firstUserMessage = chat.messages.find((m) => m.sender === 'user')
+      const hasBotReply = chat.messages.some((m) => m.sender === 'bot')
+
+      if (!firstUserMessage || !hasBotReply) continue
+
+      titleRequestRef.current.add(chat.id)
+
+      requestChatTitle(firstUserMessage.message).then((title) => {
+        setTitles((prev) => ({ ...prev, [chat.id]: title }))
+      })
+    }
+  }, [chats])
+
+  const chatsWithTitles = chats.map((c) => ({
+    ...c,
+    title: titles[c.id] ?? DEFAULT_TITLE
+  }))
+
   function setDraftText(text: string) {
     setDrafts((prev) => ({ ...prev, [draftKey]: text}))
   }
@@ -81,7 +107,7 @@ function App() {
   return (
     <div className="app-shell">
       <Sidebar 
-        chats={chats}
+        chats={chatsWithTitles}
         activeChatId={activeChatId}
         onSelectChat={setActiveChatId}
         onNewChat={createNewChat}

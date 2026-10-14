@@ -2,6 +2,9 @@ add:
   sidebar chats title generation
   make chats archive
 
+fix:
+  bot is typing and stop button interactive in wrong chats
+
 nvm versions
   nvm use 22.11.0 for prisma
   nvm use 24.16.0
