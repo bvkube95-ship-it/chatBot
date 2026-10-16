@@ -4,7 +4,7 @@ import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
 import Sidebar from './components/Sidebar'
 import { getRandomGreeting } from './utils/greetings'
-import { DEFAULT_TITLE, requestChatTitle } from './utils/chatTitle'
+import { FAILED_TITLE, fallbackTitle, requestChatTitle } from './utils/chatTitle'
 import type { MessageBox, ChatSession } from './types'
 import './App.css'
 import './components/styles/shared.css'
@@ -55,7 +55,7 @@ function App() {
     for (const chat of chats) {
       if (titleRequestRef.current.has(chat.id)) continue
 
-      const firstUserMessage = chat.messages.find((m) => m.sender === 'user' && !m.isFailed)
+      const firstUserMessage = getTitleSource(chat)
       const hasBotReply = chat.messages.some((m) => m.sender === 'bot' && !m.isError)
 
       if (!firstUserMessage || !hasBotReply) continue
@@ -68,10 +68,13 @@ function App() {
     }
   }, [chats])
 
-  const chatsWithTitles = chats.map((c) => ({
-    ...c,
-    title: titles[c.id] ?? DEFAULT_TITLE
-  }))
+  const chatsWithTitles = chats.map((c) => {
+    const source = getTitleSource(c)
+    return {
+      ...c,
+      title: titles[c.id] ?? (source ? fallbackTitle(source.message) : FAILED_TITLE)
+    }
+  })
 
   function setDraftText(text: string) {
     setDrafts((prev) => ({ ...prev, [draftKey]: text}))
@@ -121,6 +124,10 @@ function App() {
     )
   }
 
+  function getTitleSource(chat: ChatSession) {
+    return chat.messages.find((m) => m.sender === 'user' && !m.isFailed )
+  }
+
   async function sendMessage(text: string) {
     const trimmed = text.trim()
     if (!trimmed) return
@@ -138,7 +145,7 @@ function App() {
       appendMessage(chatId, userMessage)
     } else {
       setChats((prev) => [
-        { id: chatId, messages: [userMessage], title: DEFAULT_TITLE },
+        { id: chatId, messages: [userMessage], title: FAILED_TITLE },
         ...prev,
       ])
       setActiveChatId(chatId)

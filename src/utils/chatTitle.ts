@@ -1,4 +1,4 @@
-export const DEFAULT_TITLE = 'New Chat'
+export const FAILED_TITLE = 'No response'
 
 export function fallbackTitle(message: string): string {
     const text = message.trim().replace(/\s+/g, ' ')
