@@ -2,8 +2,8 @@ export const FAILED_TITLE = 'No response'
 
 export function fallbackTitle(message: string): string {
     const text = message.trim().replace(/\s+/g, ' ')
-    return text.length > 30 
-        ? text.slice(0, 30).trimEnd() + '…' 
+    return text.length > 50 
+        ? text.slice(0, 50).trimEnd() + '…' 
         : text
 }
 

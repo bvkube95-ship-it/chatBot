@@ -44,7 +44,6 @@ function ChatInput({
     setIsMultiLine(isTextMultiLine)
   }, [inputText])
 
-
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape' && isBotTyping) {

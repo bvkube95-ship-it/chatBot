@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useFavicon } from './hooks/useFavicon'
 import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
@@ -204,14 +204,18 @@ function App() {
     }
   }
 
-  function cancelRequest(chatId: string) {
+  const handleDelete = useCallback(() => {
     if (!activeChatId) return
 
-    controllersRef.current.get(chatId)?.abort()
-    controllersRef.current.delete(chatId)
-    setTyping(chatId, false)
-  }
-
+    controllersRef.current.get(activeChatId)?.abort()
+    controllersRef.current.delete(activeChatId)
+    setTypingChatIds((prev) => {
+      const next = new Set(prev)
+      next.delete(activeChatId)
+      return next
+    })
+  }, [activeChatId])
+  
   return (
     <div className="app-shell">
       <Sidebar 
@@ -239,9 +243,7 @@ function App() {
           <ChatInput 
               isBotTyping={isBotTyping}
               onSend={sendMessage}
-              onCancel={() => {
-                if (activeChatId) cancelRequest(activeChatId)
-              }}
+              onCancel={handleDelete}
               inputText={draftText}
               setInputText={setDraftText}
           />
