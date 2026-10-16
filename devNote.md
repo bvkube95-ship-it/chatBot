@@ -1,9 +1,9 @@
 add:
-  sidebar chats title generation
   make chats archive
 
 fix:
-  bot is typing and stop button interactive in wrong chats
+  shouldAutoScroll does not reset if chat was changed
+  onCancel is creating again after each render
 
 nvm versions
   nvm use 22.11.0 for prisma

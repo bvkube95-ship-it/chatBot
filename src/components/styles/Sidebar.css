@@ -5,6 +5,12 @@
     --new-chat-icon-size: 34px;
     --account-icon-size: 28px;
 }
+
+img, IonIcon {
+    user-select: none;
+    pointer-events: none;
+}
+
 .sidebar {
     position: relative;
     flex-shrink: 0;
@@ -159,6 +165,7 @@
     font-size: 13px;
     margin-top: 15px;
     margin-bottom: 4px;
+    margin-left: 5px;
     white-space: nowrap;
 }
 

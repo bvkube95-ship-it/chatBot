@@ -42,10 +42,6 @@
     border-color: rgb(25, 135, 84);
 }
 
-.chat-input:disabled::placeholder {
-    opacity: 0.5;
-}
-
 .send-btn {
     position: absolute;
 

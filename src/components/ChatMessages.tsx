@@ -58,7 +58,7 @@ function ChatMessages({ chatMessages, isBotTyping, inputHeight }: ChatMessagesPr
       ))}
       {isBotTyping && (
         <div className="chat-message-bot">
-          <div className="chat-message-text">
+          <div className="chat-message-text-bot">
             <div className="typing-indicator">
               <span></span>
               <span></span>

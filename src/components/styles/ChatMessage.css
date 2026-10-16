@@ -40,18 +40,18 @@
     min-width: 0;
 }
 
-.chat-message-text pre {
-    white-space: pre-wrap;
-    overflow-x: auto;
-    max-width: 100%;
+.chat-message-text-bot pre { 
+  white-space: pre-wrap; 
+  overflow-x: auto; 
+  max-width: 100%; 
 }
 
-.chat-message-text table {
+.chat-message-text-bot table {
   display: block;
   overflow-x: auto;
 }
 
-.chat-message-text pre code {
+.chat-message-text-bot pre code {
     border-radius: 10px;
 }
 

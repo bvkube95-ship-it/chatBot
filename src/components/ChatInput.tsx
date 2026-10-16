@@ -80,7 +80,7 @@ function ChatInput({
           value={inputText} 
           rows={1}
           onChange={saveTextInput}
-          disabled={isBotTyping}
+          readOnly={isBotTyping}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault()

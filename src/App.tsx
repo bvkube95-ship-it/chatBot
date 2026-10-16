@@ -55,8 +55,8 @@ function App() {
     for (const chat of chats) {
       if (titleRequestRef.current.has(chat.id)) continue
 
-      const firstUserMessage = chat.messages.find((m) => m.sender === 'user')
-      const hasBotReply = chat.messages.some((m) => m.sender === 'bot')
+      const firstUserMessage = chat.messages.find((m) => m.sender === 'user' && !m.isFailed)
+      const hasBotReply = chat.messages.some((m) => m.sender === 'bot' && !m.isError)
 
       if (!firstUserMessage || !hasBotReply) continue
 
@@ -106,6 +106,21 @@ function App() {
     )
   }
 
+  function markFailed(chatId: string, messageId: string) {
+    setChats((prev) => 
+      prev.map((c) => 
+        c.id === chatId
+          ? {
+            ...c,
+            messages: c.messages.map((m) => 
+              m.id === messageId ? { ...m, isFailed: true } : m
+            )
+          }
+          : c
+      )
+    )
+  }
+
   async function sendMessage(text: string) {
     const trimmed = text.trim()
     if (!trimmed) return
@@ -151,20 +166,26 @@ function App() {
 
       const data = await res.json()
 
+      if (typeof data.reply !== 'string') throw new Error('Bad response')
+
       appendMessage(chatId, {
         message: data.reply,
         sender: 'bot',
         id: crypto.randomUUID(),
       })
     } catch (error) {
+      markFailed(chatId, userMessage.id)
+
       if (error instanceof DOMException && error.name === 'AbortError') {
         // nothing
-      } else {
+      } 
+      else {
         console.error(error)
         appendMessage(chatId, {
           message: 'Error: Failed to get a response from the server.',
           sender: 'bot',
           id: crypto.randomUUID(),
+          isError: true,
         })
       }
     } finally {

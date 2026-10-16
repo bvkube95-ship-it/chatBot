@@ -19,7 +19,8 @@ function ChatMessage({ message, sender }: MessageBox) {
             components={{
               code({ className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '')
-                const isInLine = !className
+                const text = String(children)
+                const isInLine = !className && !text.includes('\n')
 
                 if (isInLine) {
                   return (
