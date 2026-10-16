@@ -2,7 +2,6 @@ add:
   make chats archive
 
 fix:
-  shouldAutoScroll does not reset if chat was changed
   onCancel is creating again after each render
 
 nvm versions

@@ -218,6 +218,7 @@ function App() {
         style={{ '--input-height': `${inputHeight}px` } as React.CSSProperties}
       >
         <ChatMessages 
+          chatId={activeChatId}
           chatMessages={currentMessages}
           isBotTyping={isBotTyping}
           inputHeight={inputHeight}

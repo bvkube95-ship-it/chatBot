@@ -1,15 +1,16 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useLayoutEffect } from 'react'
 import ChatMessage from './ChatMessage'
 import type { MessageBox } from '../types'
 import './styles/ChatMessages.css'
 
 interface ChatMessagesProps {
+  chatId: string | null
   chatMessages: MessageBox[]
   isBotTyping: boolean
   inputHeight: number
 }
 
-function ChatMessages({ chatMessages, isBotTyping, inputHeight }: ChatMessagesProps) {
+function ChatMessages({ chatId, chatMessages, isBotTyping, inputHeight }: ChatMessagesProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const shouldAutoScrollRef = useRef(true)
 
@@ -29,6 +30,14 @@ function ChatMessages({ chatMessages, isBotTyping, inputHeight }: ChatMessagesPr
       container.removeEventListener('scroll', handleScroll)
     }
   }, [])
+
+  useLayoutEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    shouldAutoScrollRef.current = true
+    container.scrollTop = container.scrollHeight
+  }, [chatId])
 
   useEffect(() => {
     const container = containerRef.current
