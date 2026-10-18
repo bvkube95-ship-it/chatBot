@@ -9,6 +9,10 @@ import type { MessageBox, ChatSession } from './types'
 import './App.css'
 import './components/styles/shared.css'
 
+function getTitleSource(chat: ChatSession) {
+    return chat.messages.find((m) => m.sender === 'user' && !m.isFailed )
+}
+
 function App() {
   const [chats, setChats] = useState<ChatSession[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
@@ -48,22 +52,22 @@ function App() {
   const draftKey = activeChatId ?? NEW_CHAT_KEY
   const draftText = drafts[draftKey] ?? ''
 
-  const [titles, setTitles] = useState<Record<string, string>>({})
   const titleRequestRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     for (const chat of chats) {
-      if (titleRequestRef.current.has(chat.id)) continue
+      if (chat.title || titleRequestRef.current.has(chat.id)) continue
 
-      const firstUserMessage = getTitleSource(chat)
-      const hasBotReply = chat.messages.some((m) => m.sender === 'bot' && !m.isError)
-
-      if (!firstUserMessage || !hasBotReply) continue
+      const source = getTitleSource(chat)
+      const hasToReply = chat.messages.some((m) => m.sender === 'bot' && !m.isError)
+      if (!source || !hasToReply) continue
 
       titleRequestRef.current.add(chat.id)
 
-      requestChatTitle(firstUserMessage.message).then((title) => {
-        setTitles((prev) => ({ ...prev, [chat.id]: title }))
+      requestChatTitle(source.message).then((title) => {
+        setChats((prev) => 
+          prev.map((c) => (c.id === chat.id ? { ...c, title } : c))
+        )
       })
     }
   }, [chats])
@@ -72,7 +76,7 @@ function App() {
     const source = getTitleSource(c)
     return {
       ...c,
-      title: titles[c.id] ?? (source ? fallbackTitle(source.message) : FAILED_TITLE)
+      title: c.title ?? (source ? fallbackTitle(source.message) : FAILED_TITLE),
     }
   })
 
@@ -124,10 +128,6 @@ function App() {
     )
   }
 
-  function getTitleSource(chat: ChatSession) {
-    return chat.messages.find((m) => m.sender === 'user' && !m.isFailed )
-  }
-
   async function sendMessage(text: string) {
     const trimmed = text.trim()
     if (!trimmed) return
@@ -145,7 +145,7 @@ function App() {
       appendMessage(chatId, userMessage)
     } else {
       setChats((prev) => [
-        { id: chatId, messages: [userMessage], title: FAILED_TITLE },
+        { id: chatId, messages: [userMessage] },
         ...prev,
       ])
       setActiveChatId(chatId)
@@ -204,7 +204,7 @@ function App() {
     }
   }
 
-  const handleDelete = useCallback(() => {
+  const handleCancel = useCallback(() => {
     if (!activeChatId) return
 
     controllersRef.current.get(activeChatId)?.abort()
@@ -243,7 +243,7 @@ function App() {
           <ChatInput 
               isBotTyping={isBotTyping}
               onSend={sendMessage}
-              onCancel={handleDelete}
+              onCancel={handleCancel}
               inputText={draftText}
               setInputText={setDraftText}
           />

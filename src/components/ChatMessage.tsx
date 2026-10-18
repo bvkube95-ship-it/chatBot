@@ -2,7 +2,6 @@ import type { MessageBox } from '../types'
 import CodeBlock from './CodeBlock'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import 'highlight.js/styles/github-dark.css'
 import './styles/ChatMessage.css'
 
 function ChatMessage({ message, sender }: MessageBox) {
@@ -17,6 +16,7 @@ function ChatMessage({ message, sender }: MessageBox) {
           <ReactMarkdown 
             remarkPlugins={[remarkGfm]} 
             components={{
+              pre: ({ children }) => <>{children}</>,
               code({ className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '')
                 const text = String(children)

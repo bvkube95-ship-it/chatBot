@@ -8,6 +8,6 @@ export interface MessageBox {
 
 export interface ChatSession {
   id: string
-  title: string
+  title?: string
   messages: MessageBox[]
 }
