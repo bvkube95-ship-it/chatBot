@@ -4,9 +4,11 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import './styles/ChatMessage.css'
 
-function ChatMessage({ message, sender }: MessageBox) {
+function ChatMessage({ message, sender, id }: MessageBox) {
   return (
-    <div className={
+    <div 
+      data-message-id={id}
+      className={
         sender === 'user'
         ? 'chat-message-user' 
         : 'chat-message-bot'
