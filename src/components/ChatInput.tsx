@@ -75,11 +75,10 @@ function ChatInput({
         <textarea
           ref={textareaRef}
           className={`chat-input ${isMultiLine ? 'multiline' : ''}`}
-          placeholder="Write a message..."
+          placeholder={isBotTyping ? "Waiting for a response..." : "Write a message..."}
           value={inputText} 
           rows={1}
           onChange={saveTextInput}
-          readOnly={isBotTyping}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault()

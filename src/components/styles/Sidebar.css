@@ -13,6 +13,7 @@ img, IonIcon {
 
 .sidebar {
     position: relative;
+    z-index: 25;
     flex-shrink: 0;
     height: 100vh;
 
@@ -23,6 +24,18 @@ img, IonIcon {
     flex-direction: column;
     padding: var(--sidebar-pad);
     box-sizing: border-box;
+
+    transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-slot {
+    flex-shrink: 0;
+    transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.sidebar-resizing .sidebar,
+body.sidebar-resizing .sidebar-slot {
+    transition: none;
 }
 
 .sidebar-top-row {

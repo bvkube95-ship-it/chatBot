@@ -15,7 +15,7 @@ interface SidebarProps {
 }
 
 const MIN_WIDTH = 200
-const MAX_WIDTH = 420
+const MAX_WIDTH = 400
 const DEFAULT_WIDTH = 260
 const HIDE_DELAY = 200
 
@@ -40,12 +40,18 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
     setWidth(widthRef.current)
   }, [])
 
+  const slotRef = useRef<HTMLDivElement>(null)
+
   const resize = useCallback((e: MouseEvent) => {
     const newWidth = Math.min(Math.max(e.clientX, MIN_WIDTH), MAX_WIDTH)
     widthRef.current = newWidth
 
     if (sidebarRef.current) {
       sidebarRef.current.style.width = `${newWidth}px`
+    }
+
+    if (slotRef.current) {
+      slotRef.current.style.width = `${newWidth}px`
     }
   }, [])
 
@@ -111,7 +117,11 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
   ].filter(Boolean).join(' ')
 
   return (
-    <div className={`sidebar-slot ${isCollapsed ? 'collapsed' : ''}`} >
+    <div 
+      className={`sidebar-slot ${isCollapsed ? 'collapsed' : ''}`} 
+      ref={slotRef}
+      style={isCollapsed ? undefined : { width: `${width}px` }}
+    >
       <div
         className={SidebarClassName}
         ref={sidebarRef}
