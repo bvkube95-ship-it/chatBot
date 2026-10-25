@@ -1,3 +1,5 @@
+import type { ChatSession } from '../types'
+
 export const FAILED_TITLE = 'No response'
 
 export function fallbackTitle(message: string): string {
@@ -27,4 +29,15 @@ export async function requestChatTitle(message: string): Promise<string> {
         console.error('Error fetching chat title:', error)
         return fallbackTitle(message)
     }
+}
+
+export function getTitleSource(chat: ChatSession) {
+    return chat.messages.find((m) => m.sender === 'user' && !m.isFailed )
+}
+
+export function getDisplayTitle(chat: ChatSession) {
+    if (chat.title) return chat.title
+
+    const source = getTitleSource(chat)
+    return source ? fallbackTitle(source.message) : FAILED_TITLE
 }

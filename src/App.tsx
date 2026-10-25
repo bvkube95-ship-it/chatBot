@@ -3,21 +3,23 @@ import { useFavicon } from './hooks/useFavicon'
 import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
 import Sidebar from './components/Sidebar'
+import Toast from './components/Toast'
 import { getRandomGreeting } from './utils/greetings'
-import { FAILED_TITLE, fallbackTitle, requestChatTitle } from './utils/chatTitle'
+import { getDisplayTitle, getTitleSource, requestChatTitle } from './utils/chatTitle'
 import type { MessageBox, ChatSession } from './types'
 import './App.css'
 import './components/styles/shared.css'
-
-function getTitleSource(chat: ChatSession) {
-    return chat.messages.find((m) => m.sender === 'user' && !m.isFailed )
-}
 
 function App() {
   const [chats, setChats] = useState<ChatSession[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
   const [inputHeight, setInputHeight] = useState(0)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [toast, setToast] = useState<{ id: number; message: string } | null>(null)
+
+  const showToast = useCallback((message: string) => {
+    setToast((prev) => prev ?? { id: Date.now(), message })
+  }, [])
 
   const NEW_CHAT_KEY = 'new-chat'
   const [typingChatIds, setTypingChatIds] = useState<Set<string>>(new Set())
@@ -28,6 +30,10 @@ function App() {
   const inputWrapperRef = useRef<HTMLDivElement>(null)
 
   useFavicon(typingChatIds.size > 0)
+
+  useEffect(() => {
+    if (!isBotTyping) setToast(null)
+  }, [isBotTyping])
 
   useEffect(() => {
     const el = inputWrapperRef.current
@@ -59,8 +65,8 @@ function App() {
       if (chat.title || titleRequestRef.current.has(chat.id)) continue
 
       const source = getTitleSource(chat)
-      const hasToReply = chat.messages.some((m) => m.sender === 'bot' && !m.isError)
-      if (!source || !hasToReply) continue
+      const hasBotReply = chat.messages.some((m) => m.sender === 'bot' && !m.isError)
+      if (!source || !hasBotReply) continue 
 
       titleRequestRef.current.add(chat.id)
 
@@ -72,13 +78,7 @@ function App() {
     }
   }, [chats])
 
-  const chatsWithTitles = chats.map((c) => {
-    const source = getTitleSource(c)
-    return {
-      ...c,
-      title: c.title ?? (source ? fallbackTitle(source.message) : FAILED_TITLE),
-    }
-  })
+  const chatsWithTitles = chats.map((c) => ({ ...c, title: getDisplayTitle(c) }))
 
   function setDraftText(text: string) {
     setDrafts((prev) => ({ ...prev, [draftKey]: text}))
@@ -228,6 +228,13 @@ function App() {
         className={`app-container ${isEmpty ? 'empty-state' : ''}`}
         style={{ '--input-height': `${inputHeight}px` } as React.CSSProperties}
       >
+        {toast && (
+          <Toast 
+            key={toast.id}
+            message={toast.message}
+            onDone={() => setToast(null)}
+          />
+        )}
         <ChatMessages 
           chatId={activeChatId}
           chatMessages={currentMessages}
@@ -244,6 +251,7 @@ function App() {
               isBotTyping={isBotTyping}
               onSend={sendMessage}
               onCancel={handleCancel}
+              onBlockedSend={() => showToast('Wait for the response to finish, or press Stop.')}
               inputText={draftText}
               setInputText={setDraftText}
           />

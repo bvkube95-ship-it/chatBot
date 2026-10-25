@@ -7,6 +7,7 @@ interface ChatInputProps {
   isBotTyping: boolean
   onSend: (text: string) => void
   onCancel: () => void
+  onBlockedSend?: () => void
   inputText: string
   setInputText: (text: string) => void
 }
@@ -15,6 +16,7 @@ function ChatInput({
   isBotTyping,
   onSend,
   onCancel,
+  onBlockedSend,
   inputText,
   setInputText,
 }: ChatInputProps) {
@@ -63,8 +65,12 @@ function ChatInput({
   }
 
   function sendMessage() {
-    if (isBotTyping ) return
     if (!inputText.trim()) return
+
+    if (isBotTyping) {
+      onBlockedSend?.()
+      return
+    } 
 
     onSend(inputText)
   }
