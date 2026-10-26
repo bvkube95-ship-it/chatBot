@@ -63,6 +63,8 @@ function App() {
   useEffect(() => {
     for (const chat of chats) {
       if (chat.title || titleRequestRef.current.has(chat.id)) continue
+      // Wait for the stream to finish so the title request doesn't compete with it
+      if (typingChatIds.has(chat.id)) continue
 
       const source = getTitleSource(chat)
       const hasBotReply = chat.messages.some((m) => m.sender === 'bot' && !m.isError)
@@ -128,6 +130,21 @@ function App() {
     )
   }
 
+  function setMessageText(chatId: string, messageId: string, text: string) {
+    setChats((prev) => 
+      prev.map((c) => 
+        c.id === chatId
+          ? {
+            ...c,
+            messages: c.messages.map((m) => 
+              m.id === messageId ? { ...m, message: text }: m
+            )
+          }
+          : c
+        )
+      )
+  }
+
   async function sendMessage(text: string) {
     const trimmed = text.trim()
     if (!trimmed) return
@@ -156,6 +173,25 @@ function App() {
 
     const controller = new AbortController()
     controllersRef.current.set(chatId, controller)
+ 
+    // Streaming state for this request; kept outside React to avoid a render per token
+    const reply = { id: null as string | null, text: '', frame: null as number | null }
+
+    // The bot message appears with the first visible text; later chunks are batched per frame
+    function showReply() {
+      if (!reply.text.trim()) return
+
+      if (!reply.id) {
+        reply.id = crypto.randomUUID()
+        appendMessage(chatId, { message: reply.text, sender: 'bot', id: reply.id })
+      } else if (reply.frame === null) {
+        const replyId = reply.id
+        reply.frame = requestAnimationFrame(() => {
+          reply.frame = null
+          setMessageText(chatId, replyId, reply.text)
+        })
+      }
+    }
 
     try {
       const res = await fetch('/api/chat', {
@@ -167,26 +203,33 @@ function App() {
         signal: controller.signal,
       })
 
-      if (!res.ok) {
+      if (!res.ok || !res.body) {
         throw new Error('Server error')
       }
 
-      const data = await res.json()
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
 
-      if (typeof data.reply !== 'string') throw new Error('Bad response')
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
 
-      appendMessage(chatId, {
-        message: data.reply,
-        sender: 'bot',
-        id: crypto.randomUUID(),
-      })
+        // stream: true keeps multi-byte characters split across chunks intact
+        reply.text += decoder.decode(value, { stream: true })
+        showReply()
+      }
+
+      reply.text += decoder.decode()
+      showReply()
+
+      if (!reply.text.trim()) throw new Error('Empty response')
     } catch (error) {
-      markFailed(chatId, userMessage.id)
+      const aborted = error instanceof DOMException && error.name === 'AbortError'
 
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        // nothing
-      } 
-      else {
+      // Nothing was received, so this prompt has no reply
+      if (!reply.id) markFailed(chatId, userMessage.id)
+
+      if (!aborted) {
         console.error(error)
         appendMessage(chatId, {
           message: 'Error: Failed to get a response from the server.',
@@ -196,6 +239,9 @@ function App() {
         })
       }
     } finally {
+      // Make sure the last chunk isn't lost to a pending frame
+      if (reply.frame !== null) cancelAnimationFrame(reply.frame)
+      if (reply.id) setMessageText(chatId, reply.id, reply.text)
 
       if (controllersRef.current.get(chatId) === controller) {
         controllersRef.current.delete(chatId)

@@ -41,6 +41,7 @@ app.post('/api/chat', async (req, res) => {
 
     const controller = new AbortController()
 
+    // Client left (Stop pressed or tab closed): stop the generation in Ollama too
     res.on('close', () => {
         if (!res.writableEnded) {
             controller.abort()
@@ -59,27 +60,69 @@ app.post('/api/chat', async (req, res) => {
                     { role: 'system', content: SYSTEM_PROMPT },
                     { role: 'user', content: message }
                 ],
-                stream: false,
+                stream: true,
                 keep_alive: '30m'
             }),
             signal: controller.signal,
         })
 
-        if (!ollamaRes.ok) {
+        if (!ollamaRes.ok || !ollamaRes.body) {
             throw new Error(`Ollama API error: ${ollamaRes.statusText}`)
         }
 
-        const data = await ollamaRes.json()
-        res.json({ reply: data.message.content })
+        // Headers are only sent with the first write
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+        res.setHeader('Cache-Control', 'no-cache')
+        res.setHeader('X-Accel-Buffering', 'no')
+
+        const reader = ollamaRes.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+
+        // Ollama streams one JSON object per line
+        const forward = (line: string) => {
+            if (!line.trim()) return
+
+            const data = JSON.parse(line)
+            if (data.error) throw new Error(data.error)
+
+            // Thinking tokens arrive in message.thinking and are skipped on purpose
+            const content = data.message?.content
+            if (content) res.write(content)
+        }
+
+        while (true) {
+            // reader.read() returns a Promise that resolves to an object with two properties 
+            //        done and value  
+            const { done, value } = await reader.read()
+            if (done) break
+
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() ?? ''
+
+            for (const line of lines) forward(line)
+        }
+
+        forward(buffer)
+        res.end()
     } catch (error) {
         if ((error as Error).name === 'AbortError') {
             return
         }
         console.log(error)
-        res.status(500).json({ error: 'Internal server error' })
+
+        if (res.headersSent) {
+            // Too late for a 500: cut the connection so the client sees the failure
+            res.destroy()
+        } else {
+            res.status(500).json({ error: 'Internal server error' })
+        }
     }
 })
 
+
+// --------- POST request to get chat title ---------
 app.post('/api/title', async (req, res) => {
     const { message } = req.body as { message: string }
 
