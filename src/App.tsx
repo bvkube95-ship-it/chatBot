@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import useFavicon from './hooks/useFavicon'
 import useElementHeight from './hooks/useElementHeight'
+import useToast from './hooks/useToast'
 
 import type { MessageBox, ChatSession } from './types'
 
@@ -20,11 +21,6 @@ function App() {
   const [chats, setChats] = useState<ChatSession[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
-  const [toast, setToast] = useState<{ id: number; message: string } | null>(null)
-
-  const showToast = useCallback((message: string) => {
-    setToast((prev) => prev ?? { id: Date.now(), message })
-  }, [])
 
   const NEW_CHAT_KEY = 'new-chat'
   const [typingChatIds, setTypingChatIds] = useState<Set<string>>(new Set())
@@ -33,12 +29,11 @@ function App() {
   const isBotTyping = activeChatId !== null && typingChatIds.has(activeChatId)
 
   const [inputWrapperRef, inputHeight] = useElementHeight<HTMLDivElement>()
-
   useFavicon(typingChatIds.size > 0)
-
-  useEffect(() => {
-    if (!isBotTyping) setToast(null)
-  }, [isBotTyping])
+  const { toast, showToast, hideToast } = useToast({
+    hideWhen: !isBotTyping,
+    resetOn: activeChatId
+  })
 
   const activeChat = chats.find((c) => c.id === activeChatId)
   const currentMessages = activeChat?.messages ?? []
@@ -242,7 +237,7 @@ function App() {
           <Toast 
             key={toast.id}
             message={toast.message}
-            onDone={() => setToast(null)}
+            onDone={hideToast}
           />
         )}
         <ChatMessages 
