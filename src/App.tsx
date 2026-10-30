@@ -6,6 +6,7 @@ import Sidebar from './components/Sidebar'
 import Toast from './components/Toast'
 import { getRandomGreeting } from './utils/greetings'
 import { getDisplayTitle, getTitleSource, requestChatTitle } from './utils/chatTitle'
+import { isAbortError, streamBotReply } from './utils/chatApi'
 import type { MessageBox, ChatSession } from './types'
 import './App.css'
 import './components/styles/shared.css'
@@ -194,42 +195,15 @@ function App() {
     }
 
     try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: trimmed }),
-        signal: controller.signal,
-      })
-
-      if (!res.ok || !res.body) {
-        throw new Error('Server error')
-      }
-
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        // stream: true keeps multi-byte characters split across chunks intact
-        reply.text += decoder.decode(value, { stream: true })
+      await streamBotReply(trimmed, controller.signal, (fullText) => {
+        reply.text = fullText
         showReply()
-      }
-
-      reply.text += decoder.decode()
-      showReply()
-
-      if (!reply.text.trim()) throw new Error('Empty response')
+      })
     } catch (error) {
-      const aborted = error instanceof DOMException && error.name === 'AbortError'
-
       // Nothing was received, so this prompt has no reply
       if (!reply.id) markFailed(chatId, userMessage.id)
 
-      if (!aborted) {
+      if (!isAbortError(error)) {
         console.error(error)
         appendMessage(chatId, {
           message: 'Error: Failed to get a response from the server.',
