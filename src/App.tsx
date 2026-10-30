@@ -1,20 +1,24 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
-import { useFavicon } from './hooks/useFavicon'
+import useFavicon from './hooks/useFavicon'
+import useElementHeight from './hooks/useElementHeight'
+
+import type { MessageBox, ChatSession } from './types'
+
 import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
 import Sidebar from './components/Sidebar'
 import Toast from './components/Toast'
+
 import { getRandomGreeting } from './utils/greetings'
 import { getDisplayTitle, getTitleSource, requestChatTitle } from './utils/chatTitle'
 import { isAbortError, streamBotReply } from './utils/chatApi'
-import type { MessageBox, ChatSession } from './types'
+
 import './App.css'
 import './components/styles/shared.css'
 
 function App() {
   const [chats, setChats] = useState<ChatSession[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
-  const [inputHeight, setInputHeight] = useState(0)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
   const [toast, setToast] = useState<{ id: number; message: string } | null>(null)
 
@@ -28,27 +32,13 @@ function App() {
 
   const isBotTyping = activeChatId !== null && typingChatIds.has(activeChatId)
 
-  const inputWrapperRef = useRef<HTMLDivElement>(null)
+  const [inputWrapperRef, inputHeight] = useElementHeight<HTMLDivElement>()
 
   useFavicon(typingChatIds.size > 0)
 
   useEffect(() => {
     if (!isBotTyping) setToast(null)
   }, [isBotTyping])
-
-  useEffect(() => {
-    const el = inputWrapperRef.current
-    if (!el) return
-
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setInputHeight(entry.contentRect.height)
-      }
-    })
-
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
 
   const activeChat = chats.find((c) => c.id === activeChatId)
   const currentMessages = activeChat?.messages ?? []
