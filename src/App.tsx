@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import useFavicon from './hooks/useFavicon'
 import useElementHeight from './hooks/useElementHeight'
 import useToast from './hooks/useToast'
+import useDrafts from './hooks/useDrafts'
 
 import type { MessageBox, ChatSession } from './types'
 
@@ -20,9 +21,7 @@ import './components/styles/shared.css'
 function App() {
   const [chats, setChats] = useState<ChatSession[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
-  const [drafts, setDrafts] = useState<Record<string, string>>({})
 
-  const NEW_CHAT_KEY = 'new-chat'
   const [typingChatIds, setTypingChatIds] = useState<Set<string>>(new Set())
   const controllersRef = useRef<Map<string, AbortController>>(new Map())
 
@@ -34,15 +33,13 @@ function App() {
     hideWhen: !isBotTyping,
     resetOn: activeChatId
   })
+  const { draftText, setDraftText, clearDraft } = useDrafts(activeChatId)
 
   const activeChat = chats.find((c) => c.id === activeChatId)
   const currentMessages = activeChat?.messages ?? []
   const isEmpty = currentMessages.length === 0
 
   const greetings = useMemo(() => getRandomGreeting(), [activeChatId])
-
-  const draftKey = activeChatId ?? NEW_CHAT_KEY
-  const draftText = drafts[draftKey] ?? ''
 
   const titleRequestRef = useRef<Set<string>>(new Set())
 
@@ -67,18 +64,6 @@ function App() {
   }, [chats])
 
   const chatsWithTitles = chats.map((c) => ({ ...c, title: getDisplayTitle(c) }))
-
-  function setDraftText(text: string) {
-    setDrafts((prev) => ({ ...prev, [draftKey]: text}))
-  }
-
-  function clearDraft(key: string) {
-    setDrafts((prev) => {
-      const next = { ...prev }
-      delete next[key]
-      return next
-    })
-  }
 
   function createNewChat() {
     setActiveChatId(null)
@@ -154,7 +139,7 @@ function App() {
       setActiveChatId(chatId)
     }
 
-    clearDraft(draftKey)
+    clearDraft()
     setTyping(chatId, true)
 
     const controller = new AbortController()

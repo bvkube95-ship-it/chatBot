@@ -76,6 +76,10 @@
     transform: scale(0.92);
 }
 
+.send-btn:focus-visible {
+    outline: none;
+}
+
 .send-icon {
     position: relative;
 

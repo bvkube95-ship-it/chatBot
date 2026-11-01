@@ -10,6 +10,10 @@
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
+.chat-messages-container:focus-visible {
+    outline: none;
+}
+
 .chat-messages-container::-webkit-scrollbar {
     width: 8px;
 }
