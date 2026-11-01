@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { useState, useMemo, useRef, useCallback } from 'react'
 import useFavicon from './hooks/useFavicon'
 import useElementHeight from './hooks/useElementHeight'
 import useToast from './hooks/useToast'
 import useDrafts from './hooks/useDrafts'
+import useChatTitles from './hooks/useChatTitles'
 
 import type { MessageBox, ChatSession } from './types'
 
@@ -12,7 +13,6 @@ import Sidebar from './components/Sidebar'
 import Toast from './components/Toast'
 
 import { getRandomGreeting } from './utils/greetings'
-import { getDisplayTitle, getTitleSource, requestChatTitle } from './utils/chatTitle'
 import { isAbortError, streamBotReply } from './utils/chatApi'
 
 import './App.css'
@@ -34,36 +34,13 @@ function App() {
     resetOn: activeChatId
   })
   const { draftText, setDraftText, clearDraft } = useDrafts(activeChatId)
+  const { chatsWithTitles } = useChatTitles(chats, setChats, typingChatIds)
 
   const activeChat = chats.find((c) => c.id === activeChatId)
   const currentMessages = activeChat?.messages ?? []
   const isEmpty = currentMessages.length === 0
 
   const greetings = useMemo(() => getRandomGreeting(), [activeChatId])
-
-  const titleRequestRef = useRef<Set<string>>(new Set())
-
-  useEffect(() => {
-    for (const chat of chats) {
-      if (chat.title || titleRequestRef.current.has(chat.id)) continue
-      // Wait for the stream to finish so the title request doesn't compete with it
-      if (typingChatIds.has(chat.id)) continue
-
-      const source = getTitleSource(chat)
-      const hasBotReply = chat.messages.some((m) => m.sender === 'bot' && !m.isError)
-      if (!source || !hasBotReply) continue 
-
-      titleRequestRef.current.add(chat.id)
-
-      requestChatTitle(source.message).then((title) => {
-        setChats((prev) => 
-          prev.map((c) => (c.id === chat.id ? { ...c, title } : c))
-        )
-      })
-    }
-  }, [chats])
-
-  const chatsWithTitles = chats.map((c) => ({ ...c, title: getDisplayTitle(c) }))
 
   function createNewChat() {
     setActiveChatId(null)
