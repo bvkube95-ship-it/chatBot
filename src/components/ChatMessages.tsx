@@ -204,19 +204,20 @@ function ChatMessages({ chatId, chatMessages, isBotTyping, inputHeight }: ChatMe
     }
   }, [chatMessages, isBotTyping, inputHeight, chatId])
 
+  const lastMessage = chatMessages[chatMessages.length - 1]
+  const isWaitingForReply = isBotTyping && lastMessage?.sender === 'user'
+
   return (
     <div className="chat-messages-container" ref={containerRef}>
       <div className="chat-messages-inner" ref={innerRef}>
         {chatMessages.map(({ message, sender, id }) => (
           <ChatMessage key={id} message={message} sender={sender} id={id} />
         ))}
-        {isBotTyping && (
+        {isWaitingForReply && (
           <div className="chat-message-bot">
             <div className="chat-message-text-bot">
               <div className="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span className="typing-shimmer">Thinking…</span>
               </div>
             </div>
           </div>
