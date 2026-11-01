@@ -20,7 +20,6 @@ function ChatInput({
   inputText,
   setInputText,
 }: ChatInputProps) {
-
   const [isMultiLine, setIsMultiLine] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 

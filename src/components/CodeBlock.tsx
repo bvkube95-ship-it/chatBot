@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { IonIcon } from '@ionic/react'
@@ -10,7 +10,7 @@ interface CodeBlockProps {
   code: string
 }
 
-function CodeBlock({ language, code }: CodeBlockProps) {
+const CodeBlock = memo(function CodeBlock({ language, code }: CodeBlockProps) {
   const [ copied, setCopied ] = useState(false)
 
   const handleCopy = async () => {
@@ -63,6 +63,6 @@ function CodeBlock({ language, code }: CodeBlockProps) {
       </SyntaxHighlighter>
     </div>
   )
-}
+})
 
 export default CodeBlock
