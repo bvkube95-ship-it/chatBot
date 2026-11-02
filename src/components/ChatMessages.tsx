@@ -1,6 +1,8 @@
-import { useEffect, useRef, useLayoutEffect, useCallback } from 'react'
+import { useEffect, useRef, useLayoutEffect, useCallback, useState } from 'react'
 import ChatMessage from './ChatMessage'
 import type { MessageBox } from '../types'
+import { IonIcon } from '@ionic/react';
+import { arrowDown } from 'ionicons/icons'
 import './styles/ChatMessages.css'
 
 interface ChatMessagesProps {
@@ -12,11 +14,14 @@ interface ChatMessagesProps {
 
 const BOTTOM_THRESHOLD = 150
 const PIN_TOP_OFFSET = 16
+// How far from the end of the content the view must be before the "Go down" button appears
+const SCROLL_BUTTON_THRESHOLD = 200
 
 function ChatMessages({ chatId, chatMessages, isBotTyping, inputHeight }: ChatMessagesProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
   const spacerRef = useRef<HTMLDivElement>(null)
+  const [showScrollButton, setShowScrollButton] = useState(false)
  
   const shouldAutoScrollRef = useRef(true)
   const scrollPositionRef = useRef<Record<string, number>>({})
@@ -95,6 +100,34 @@ function ChatMessages({ chatId, chatMessages, isBotTyping, inputHeight }: ChatMe
     container.scrollTo({ top: container.scrollTop + delta, behavior })
   }, [getPinnedElement])
 
+  const updateScrollButton = useCallback(() => {
+    const container = containerRef.current
+    const inner = innerRef.current
+    const spacer = spacerRef.current
+    if (!container || !inner || !spacer) return
+
+    // The end of the content is measured without the spacer: empty space isn't the bottom of the chat
+    const contentBottom =
+      inner.getBoundingClientRect().bottom - spacer.getBoundingClientRect().height
+    const distance = contentBottom - container.getBoundingClientRect().bottom
+
+    setShowScrollButton(distance > SCROLL_BUTTON_THRESHOLD)
+  }, [])
+
+  const scrollToBottom = useCallback(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    // Take back the extra space and drop the pin, so the view can follow the reply to its end
+    releaseSpace()
+    pinnedIdRef.current = null
+    const id = currentChatIdRef.current
+    if (id) delete pinnedByChatRef.current[id]
+
+    shouldAutoScrollRef.current = true
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
+  }, [releaseSpace])
+
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -115,20 +148,25 @@ function ChatMessages({ chatId, chatMessages, isBotTyping, inputHeight }: ChatMe
  
       // While the bot is generating, the space is needed for the reply
       if (scrolledUp && !isBotTyping) releaseSpace()
+        
+        updateScrollButton()
     }
  
     container.addEventListener('scroll', handleScroll)
     return () => container.removeEventListener('scroll', handleScroll)
-  }, [isBotTyping, releaseSpace])
+  }, [isBotTyping, releaseSpace, updateScrollButton])
 
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
-    const observer = new ResizeObserver(() => updateSpacer())
+    const observer = new ResizeObserver(() => {
+      updateSpacer()
+      updateScrollButton()
+    })
     observer.observe(container)
     return () => observer.disconnect()
-  }, [updateSpacer])
+  }, [updateSpacer, updateScrollButton])
 
   // chat switched
   useLayoutEffect(() => {
@@ -152,7 +190,8 @@ function ChatMessages({ chatId, chatMessages, isBotTyping, inputHeight }: ChatMe
       container.scrollHeight - container.scrollTop - container.clientHeight
 
     shouldAutoScrollRef.current = distanceFromBottom < BOTTOM_THRESHOLD
-  }, [chatId, updateSpacer])
+    updateScrollButton()
+  }, [chatId, updateSpacer, updateScrollButton])
 
   // User sent a message: pin it to the top
   useLayoutEffect(() => {
@@ -181,7 +220,8 @@ function ChatMessages({ chatId, chatMessages, isBotTyping, inputHeight }: ChatMe
 
   useLayoutEffect(() => {
     updateSpacer()
-  }, [chatMessages, isBotTyping, inputHeight, updateSpacer])
+    updateScrollButton()
+  }, [chatMessages, isBotTyping, inputHeight, updateSpacer, updateScrollButton])
 
   useEffect(() => {
     const container = containerRef.current
@@ -208,24 +248,38 @@ function ChatMessages({ chatId, chatMessages, isBotTyping, inputHeight }: ChatMe
   const isWaitingForReply = isBotTyping && lastMessage?.sender === 'user'
 
   return (
-    <div className="chat-messages-container" ref={containerRef}>
-      <div className="chat-messages-inner" ref={innerRef}>
-        {chatMessages.map(({ message, sender, id }) => (
-          <ChatMessage key={id} message={message} sender={sender} id={id} />
-        ))}
-        {isWaitingForReply && (
-          <div className="chat-message-bot">
-            <div className="chat-message-text-bot">
-              <div className="typing-indicator">
-                <span className="typing-shimmer">Thinking…</span>
+    <>
+      <div className="chat-messages-container" ref={containerRef}>
+        <div className="chat-messages-inner" ref={innerRef}>
+          {chatMessages.map(({ message, sender, id }) => (
+            <ChatMessage key={id} message={message} sender={sender} id={id} />
+          ))}
+          {isWaitingForReply && (
+            <div className="chat-message-bot">
+              <div className="chat-message-text-bot">
+                <div className="typing-indicator">
+                  <span className="typing-shimmer">Thinking…</span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        {/* Height is set imperatively in updateSpacer and releaseSpace */}
-        <div ref={spacerRef} aria-hidden="true" />
+          )}
+          {/* Height is set imperatively in updateSpacer and releaseSpace */}
+          <div ref={spacerRef} aria-hidden="true" />
+        </div>
       </div>
-    </div>
+      <button
+        type="button"
+        className={`scroll-down-btn${showScrollButton ? ' visible' : ''}`}
+        onClick={scrollToBottom}
+        // A mouse click shouldn't steal focus from the input
+        onMouseDown={(e) => e.preventDefault()}
+        aria-label="Go down"
+        aria-hidden={!showScrollButton}
+        tabIndex={showScrollButton ? 0 : -1}
+      >
+        <IonIcon icon={arrowDown} />
+      </button>
+    </>
   )
 }
 

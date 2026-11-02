@@ -84,3 +84,52 @@
     from { background-position: 100% 0; }
     to   { background-position: -100% 0; }
 }
+
+.scroll-down-btn {
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--input-height, 90px) + 12px);
+    z-index: 5;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+
+    color: rgb(230, 230, 230);
+    background-color: rgb(37, 37, 37);
+    border: 1px solid rgb(58, 58, 58);
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+
+.scroll-down-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+}
+
+.scroll-down-btn:hover {
+    background-color: rgb(48, 48, 48);
+}
+
+.scroll-down-btn.visible:active {
+    transform: translate(-50%, 0) scale(0.92);
+}
+
+.scroll-down-btn:focus-visible {
+    outline: 2px solid rgba(25, 135, 84, 0.85);
+    outline-offset: 2px;
+}
+
+.scroll-down-btn ion-icon {
+    font-size: 20px;
+}
