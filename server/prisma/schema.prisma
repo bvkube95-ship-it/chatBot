@@ -9,13 +9,24 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
-  googleId  String   @unique
   email     String   @unique
+  googleId  String?  @unique
   name      String?
   avatarUrl String?
   createdAt DateTime @default(now())
 
   chats     Chat[]
+}
+
+model LoginToken {
+  id        String    @id @default(uuid())
+  email     String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email])
 }
 
 model Chat {
