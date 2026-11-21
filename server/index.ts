@@ -1,13 +1,20 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import SYSTEM_PROMPT from './prompts/SYSTEM_PROMPT'
 import { TITLE_SYSTEM, TITLE_EXAMPLES } from './prompts/TITLE_PROMPTS'
+import { authRouter, requireAuth } from './auth'
 
 const app = express()
 app.use(cors({
-    origin: 'http://localhost:5173'
+    origin: 'http://localhost:5173',
+    credentials: true,
 }))
 app.use(express.json())
+app.use(cookieParser())
+
+app.use('/auth', authRouter)
 
 const OLLAMA_URL = 'http://localhost:11434/api/chat'
 const AI_MODEL = 'qwen3.5:4b'
@@ -32,7 +39,7 @@ function parseTitle(raw: string): string | null {
     }
 }
 
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', requireAuth, async (req, res) => {
     const { message } = req.body as { message: string }
 
     if (!message) {
@@ -123,7 +130,7 @@ app.post('/api/chat', async (req, res) => {
 
 
 // --------- POST request to get chat title ---------
-app.post('/api/title', async (req, res) => {
+app.post('/api/title', requireAuth, async (req, res) => {
     const { message } = req.body as { message: string }
 
     if (!message) {
