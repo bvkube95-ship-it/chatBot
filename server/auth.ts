@@ -5,10 +5,9 @@ import nodemailer from 'nodemailer'
 import { OAuth2Client } from 'google-auth-library'
 import { z } from 'zod'
 import rateLimit from 'express-rate-limit'
-import prisma from './Db'
+import prisma from './db'
 
 const {
-  DATABASE_URL,
   CLIENT_URL,
   SERVER_URL,
   JWT_SECRET,

@@ -5,6 +5,7 @@ import useToast from './hooks/useToast'
 import useDrafts from './hooks/useDrafts'
 import useChatTitles from './hooks/useChatTitles'
 import useChats from './hooks/useChats'
+import useAuth from './hooks/useAuth'
 
 import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
@@ -17,6 +18,10 @@ import './App.css'
 import './components/styles/shared.css'
 
 function App() {
+  const { user, isLoading } = useAuth()
+  console.log({user, isLoading})
+
+
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
 
   const { draftText, setDraftText, clearDraft } = useDrafts(activeChatId)
