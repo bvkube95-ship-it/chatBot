@@ -24,6 +24,10 @@ export async function sendMagicLink(email: string): Promise<void> {
         body: JSON.stringify({ email }),
     })
 
+    if (res.status === 429) {
+        throw new Error('Too many attempts. Please try again in a few minutes.')
+    }
+
     if(!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error(data.error ?? 'could not send the link')

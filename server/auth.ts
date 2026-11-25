@@ -57,11 +57,11 @@ const baseCookie: CookieOptions = {
 
 function setSession(res: Response, userId: string) {
     const token = jwt.sign({ sub: userId }, JWT_SECRET!, {
-        expiresIn: SESSION_DAYS * 24 * 60 * 60, // в секундах
+        expiresIn: SESSION_DAYS * 24 * 60 * 60, // in seconds
     })
     res.cookie(SESSION_COOKIE, token, {
         ...baseCookie,
-        maxAge: SESSION_DAYS * 24 * 60 * 60 * 1000, // в миллисекундах
+        maxAge: SESSION_DAYS * 24 * 60 * 60 * 1000, // in milliseconds
     })
 }
 

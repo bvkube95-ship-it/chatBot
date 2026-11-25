@@ -11,6 +11,7 @@ import ChatInput from './components/ChatInput'
 import ChatMessages from './components/ChatMessages'
 import Sidebar from './components/Sidebar'
 import Toast from './components/Toast'
+import AuthModal from "./components/AuthModal"
 
 import { getRandomGreeting } from './utils/greetings'
 
@@ -23,6 +24,7 @@ function App() {
 
 
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
+  const [isAuthOpen, setIsAuthOpen] = useState(true)
 
   const { draftText, setDraftText, clearDraft } = useDrafts(activeChatId)
 
@@ -103,6 +105,7 @@ function App() {
           )}
         </div>
       </div>
+        {isAuthOpen && <AuthModal onClose={() => setIsAuthOpen(false)} />}
     </div>
   )
 }
