@@ -35,7 +35,7 @@ export async function sendMagicLink(email: string): Promise<void> {
 }
 
 export async function logoutRequest(): Promise<void> {
-    await fetch('auth/logout', { 
+    await fetch('/auth/logout', { 
         method: 'POST', 
         credentials: 'include' 
     })

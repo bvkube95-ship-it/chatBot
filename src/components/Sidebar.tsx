@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import type { ChatSession } from '../types'
+import type { User } from "../utils/authApi"
 import { IonIcon } from '@ionic/react'
-import { chatbubbleOutline, personCircleOutline } from 'ionicons/icons'
+import { chatbubbleOutline, personCircleOutline, logOutOutline } from 'ionicons/icons'
 import sidebarIcon from "../assets/sidebar-icon.png"
 import logoIcon from "../assets/logo-white.png"
 import newChat from "../assets/new-chat.png"
@@ -12,6 +13,10 @@ interface SidebarProps {
   activeChatId: string | null
   onSelectChat: (id: string) => void
   onNewChat: () => void
+  user: User | null
+  isAuthLoading: boolean
+  onSignIn: () => void
+  onLogout: () => void
 }
 
 const MIN_WIDTH = 200
@@ -19,15 +24,62 @@ const MAX_WIDTH = 400
 const DEFAULT_WIDTH = 260
 const HIDE_DELAY = 200
 
-function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps) {
+function Sidebar({ 
+  chats, activeChatId, onSelectChat, onNewChat,
+  user, isAuthLoading, onSignIn, onLogout, }: SidebarProps) {
+
   const [width, setWidth] = useState(DEFAULT_WIDTH)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
   const [isPhantomVisible, setIsPhantomVisible] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [failedAvatar, setFailedAvatar] = useState<string | null>(null)
+  const footerRef = useRef<HTMLDivElement>(null)
 
   const sidebarRef = useRef<HTMLDivElement>(null)
   const widthRef = useRef(DEFAULT_WIDTH)
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  /* --------- ACCOUNT MENU --------- */
+
+  // Close the account menu on outside click or Escape
+  useEffect(() => {
+    if (!isMenuOpen) return
+
+    function onMouseDown(e: MouseEvent) {
+      if (footerRef.current && !footerRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false)
+      }
+    }
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setIsMenuOpen(false)
+    }
+
+    document.addEventListener('mousedown', onMouseDown)
+    document.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [isMenuOpen])
+
+  function handleAccountClick() {
+    if (isAuthLoading) return
+    if (!user) {
+      onSignIn()
+      return
+    }
+    setIsMenuOpen((prev) => !prev)
+  }
+
+  function handleLogout() {
+    setIsMenuOpen(false)
+    onLogout()
+  }
+
+  const avatarUrl = user?.avatarUrl ?? null
+  const initial = (user?.name ?? user?.email ?? '').trim().charAt(0).toUpperCase()
 
   /* --------- RESIZING --------- */
 
@@ -177,16 +229,44 @@ function Sidebar({ chats, activeChatId, onSelectChat, onNewChat }: SidebarProps)
           ))}
         </div>
 
-        <div className="sidebar-footer">
+        <div className="sidebar-footer" ref={footerRef}>
+          {user && isMenuOpen && (
+            <div className="account-menu" role="menu">
+              <div className="account-menu-email">{user.email}</div>
+              <button className="account-menu-item" role="menuitem" onClick={handleLogout}>
+                <IonIcon icon={logOutOutline} className="account-menu-icon" />
+                Log out
+              </button>
+            </div>
+          )}
+
           <button
             className="account-btn"
-            data-tooltip={isRail ? 'Account' : undefined}
+            onClick={handleAccountClick}
+            aria-haspopup={user ? 'menu' : undefined}
+            aria-expanded={user ? isMenuOpen : undefined}
+            data-tooltip={isRail ? (user ? 'Account' : 'Sign in') : undefined}
           >
-            <IonIcon icon={personCircleOutline} className="account-icon" />
-            <span className="account-label">Account</span>
+            {user ? (
+              avatarUrl && failedAvatar !== avatarUrl ? (
+                <img
+                  className="account-avatar"
+                  src={avatarUrl}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  onError={() => setFailedAvatar(avatarUrl)}
+                />
+              ) : (
+                <span className="account-avatar account-avatar-fallback">{initial}</span>
+              )
+            ) : (
+              <IonIcon icon={personCircleOutline} className="account-icon" />
+            )}
+            <span className="account-label">
+              {isAuthLoading ? '' : user ? (user.name ?? user.email) : 'Sign in'}
+            </span>
           </button>
         </div>
-
         {!isCollapsed && (
           <div
             className={`sidebar-resize-handle ${isResizing ? 'active' : ''}`}

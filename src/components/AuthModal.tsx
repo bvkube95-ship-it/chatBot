@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { SubmitEvent } from 'react'
 import { sendMagicLink } from '../utils/authApi'
+import "./styles/Modal.css"
 import "./styles/AuthModal.css"
 
-interface AuthModelProps {
+interface AuthModalProps {
   onClose: () => void
 }
 
 type Status = "idle" | "sending" | "sent"
 
-function AuthModel({ onClose }: AuthModelProps) {
+function AuthModal({ onClose }: AuthModalProps) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState('')
@@ -17,7 +18,7 @@ function AuthModel({ onClose }: AuthModelProps) {
   // close on Escape
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose
+      if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -28,7 +29,7 @@ function AuthModel({ onClose }: AuthModelProps) {
     window.location.href = '/auth/google'
   }
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     if (status === 'sending') return
 
@@ -46,30 +47,30 @@ function AuthModel({ onClose }: AuthModelProps) {
 
   return (
     <div
-      className="auth-overlay"
+      className="modal-overlay"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
       <div
-        className="auth-modal"
+        className="modal"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="auth-title"
+        aria-labelledby="modal-title"
       >
-        <button className="auth-close" onClick={onClose} aria-label="Close">
+        <button className="modal-close" onClick={onClose} aria-label="Close">
           ×
         </button>
 
         {status === 'sent' ? (
           <div className="auth-sent">
-            <h2 id="auth-title" className="auth-title">Check your email</h2>
-            <p className="auth-text">
+            <h2 id="modal-title" className="modal-title">Check your email</h2>
+            <p className="modal-text">
               We sent a sign-in link to <strong>{email}</strong>. It works for 15 minutes.
             </p>
             <p className="auth-hint">Can't find it? Check your Spam folder.</p>
             <button
-              className="auth-secondary-btn"
+              className="modal-btn-secondary"
               onClick={() => setStatus('idle')}
             >
               Use a different email
@@ -77,10 +78,10 @@ function AuthModel({ onClose }: AuthModelProps) {
           </div>
         ) : (
           <>
-            <h2 id="auth-title" className="auth-title">Sign in to NYX Assist</h2>
-            <p className="auth-text">Continue with Google or get a link by email.</p>
+            <h2 id="modal-title" className="modal-title">Sign in to NYX Assist</h2>
+            <p className="modal-text">Continue with Google or get a link by email.</p>
 
-            <button className="auth-google-btn" onClick={continueWithGoogle}>
+            <button className="modal-btn-secondary" onClick={continueWithGoogle}>
               <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
                 <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
@@ -105,7 +106,7 @@ function AuthModel({ onClose }: AuthModelProps) {
               />
               {error && <p className="auth-error" role="alert">{error}</p>}
               <button
-                className="auth-primary-btn"
+                className="modal-btn-primary"
                 type="submit"
                 disabled={status === 'sending'}
               >
@@ -119,4 +120,4 @@ function AuthModel({ onClose }: AuthModelProps) {
   )
 }
 
-export default AuthModel
+export default AuthModal

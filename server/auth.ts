@@ -139,6 +139,22 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     }
 }
 
+// Like requireAuth, but never blocks: a valid session sets req.userId,
+// anything else (no cookie, expired or broken token) means "guest".
+export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
+    const token = req.cookies?.[SESSION_COOKIE]
+
+    if (token) {
+        try {
+            const payload = jwt.verify(token, JWT_SECRET!) as jwt.JwtPayload
+            req.userId = payload.sub as string
+        } catch {
+            // stale cookie: treat as a guest
+        }
+    }
+    next()
+}
+
 export const authRouter = Router()
 
 authRouter.use(
