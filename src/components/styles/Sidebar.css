@@ -3,7 +3,7 @@
     --sidebar-pad: 8px;
     --btn-size: 34px;
     --new-chat-icon-size: 34px;
-    --account-icon-size: 28px;
+    --account-icon-size: 23px;
 }
 
 img, IonIcon {
@@ -117,7 +117,9 @@ body.sidebar-resizing .sidebar-slot {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-grow: 1;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-bottom: 12px;
 
     height: var(--btn-size);
     padding: 0 calc((var(--btn-size) - var(--new-chat-icon-size)) / 2);
@@ -136,7 +138,7 @@ body.sidebar-resizing .sidebar-slot {
 }
 
 .new-chat-btn:hover {
-    background-color: rgb(40, 40, 40);
+    background-color: rgba(255, 255, 255, 0.06);
 }
 
 .new-chat-icon {
@@ -234,8 +236,9 @@ body.sidebar-resizing .sidebar-slot {
 }
 
 .sidebar-footer {
-    margin-top: auto;
-    padding-top: 12px;
+    margin: auto calc(var(--sidebar-pad) * -1) 0;
+    padding: 8px var(--sidebar-pad) 0;
+    border-top: 1px solid rgb(45, 45, 45);
     position: relative;
 }
 
@@ -312,11 +315,16 @@ body.sidebar-resizing {
         box-shadow 0.22s ease;
 }
 
-.sidebar.collapsed:not(.visible) .chat-list,
+.sidebar.collapsed:not(.visible) .chats-span,
+.sidebar.collapsed:not(.visible) .chat-list-item,
 .sidebar.collapsed:not(.visible) .sidebar-title,
 .sidebar.collapsed:not(.visible) .new-chat-label,
 .sidebar.collapsed:not(.visible) .account-label {
     display: none;
+}
+
+.sidebar.collapsed:not(.visible) .chat-list {
+    overflow: visible;
 }
 
 .sidebar.collapsed:not(.visible) .new-chat-btn,

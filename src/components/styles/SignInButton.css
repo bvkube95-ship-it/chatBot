@@ -1,0 +1,30 @@
+.top-signin-btn {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 20;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 34px;
+    padding: 20px 16px;
+    box-sizing: border-box;
+    line-height: 1;
+
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    border: none;
+    border-radius: 20px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.top-signin-btn:hover {
+    background-color: rgb(221, 221, 221);
+}

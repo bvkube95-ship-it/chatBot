@@ -1,3 +1,11 @@
+:root {
+    --topbar-height: 56px;
+}
+
+.app-container:not(.empty-state) .chat-messages-inner {
+    margin-top: calc(var(--topbar-height) + 25px);
+}
+
 body {
     font-family: 'Arial';
     margin: 0;

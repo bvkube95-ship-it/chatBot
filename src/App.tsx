@@ -14,6 +14,7 @@ import Sidebar from './components/Sidebar'
 import Toast from './components/Toast'
 import AuthModal from './components/AuthModal'
 import ConfirmClearModal from './components/ConfirmClearModal'
+import SignInButton from './components/SignInButton'
 
 import { getRandomGreeting } from './utils/greetings'
 
@@ -84,6 +85,10 @@ function App() {
     await logout()
     resetChats()
   }
+
+  function openAuth() {
+    setIsAuthOpen(true)
+  }
   
   return (
     <div className="app-shell">
@@ -94,7 +99,7 @@ function App() {
         onNewChat={createNewChat}
         user={user}
         isAuthLoading={isAuthLoading}
-        onSignIn={() => setIsAuthOpen(true)}
+        onSignIn={openAuth}
         onLogout={handleLogout}
       />
       <div 
@@ -133,6 +138,7 @@ function App() {
           )}
         </div>
       </div>
+        {!user && !isAuthLoading && <SignInButton onClick={openAuth} />}
         {isAuthOpen && <AuthModal onClose={() => setIsAuthOpen(false)} />}
         {isClearConfirmOpen && (
           <ConfirmClearModal

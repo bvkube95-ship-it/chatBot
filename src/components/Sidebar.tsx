@@ -204,7 +204,9 @@ function Sidebar({
           <span className="sidebar-title">NYX Assist</span>
         </div>
 
-        <div className="sidebar-header">
+          
+
+        <div className="chat-list">
           <button 
             className="new-chat-btn" 
             onClick={onNewChat}
@@ -213,9 +215,6 @@ function Sidebar({
             <img src={newChat} className="new-chat-icon" />
             <span className="new-chat-label">New chat</span>
           </button>
-        </div>
-
-        <div className="chat-list">
           <span className="chats-span">Chats and tasks</span>
           {chats.map((chat) => (
             <button
